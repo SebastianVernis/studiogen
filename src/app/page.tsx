@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart, Cpu, CircuitBoard, Music2, Disc3, ActivitySquare, Ban, AlertOctagon, Code2 } from 'lucide-react';
+import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart, Cpu, CircuitBoard, Music2, Disc3, ActivitySquare, Ban, AlertOctagon, Code2, DollarSign, Landmark, CreditCard } from 'lucide-react';
 import FuturisticBackground from '@/components/futuristic-background';
 import { artStyles, MAX_PROMPTS_OVERALL, MAX_PROCESSING_JOBS, DOWNLOAD_DELAY_MS, type DisplayItem, type PromptJob, type ArtStyle } from '@/lib/artbot-config';
 import { generateImageFromPrompt } from '@/ai/flows/generate-image-from-prompt';
@@ -18,6 +18,7 @@ import HeartRain from '@/components/ui/heart-rain';
 import TechEffect from '@/components/ui/tech-effect';
 import MusicVibes from '@/components/ui/music-vibes';
 import AccessDeniedEffect from '@/components/ui/access-denied-effect';
+import MoneyRain from '@/components/ui/money-rain';
 
 
 const isValidImageUrl = (url: string): boolean => {
@@ -31,7 +32,8 @@ const passwordGreetings: Record<string, string> = {
   "Chispart123": "Hola, Amo.",
   "Patrona1": "Hola, amor de mi vida",
   "ChispukAdmin": "El que no baila no opina",
-  "supersecretpassword": "¿Tú qué haces aquí? ¡LARGO!"
+  "supersecretpassword": "¿Tú qué haces aquí? ¡LARGO!",
+  "Miau1234*": "¡A hacer billetes, Miau!"
 };
 
 const ImageGeneratorApp = () => {
@@ -48,6 +50,8 @@ const ImageGeneratorApp = () => {
   const [musicVibesKey, setMusicVibesKey] = useState(0);
   const [showAccessDeniedEffect, setShowAccessDeniedEffect] = useState(false);
   const [accessDeniedEffectKey, setAccessDeniedEffectKey] = useState(0);
+  const [showMoneyAnimation, setShowMoneyAnimation] = useState(false);
+  const [moneyAnimationKey, setMoneyAnimationKey] = useState(0);
 
 
   const [inputMode, setInputMode] = useState<InputMode>('prompt_only');
@@ -69,6 +73,7 @@ const ImageGeneratorApp = () => {
     setShowTechEffect(false);
     setShowMusicVibes(false);
     setShowAccessDeniedEffect(false);
+    setShowMoneyAnimation(false);
   };
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
@@ -92,6 +97,9 @@ const ImageGeneratorApp = () => {
       } else if (passwordInput === "supersecretpassword") {
         setShowAccessDeniedEffect(true);
         setAccessDeniedEffectKey(Date.now());
+      } else if (passwordInput === "Miau1234*") {
+        setShowMoneyAnimation(true);
+        setMoneyAnimationKey(Date.now());
       }
       setPasswordInput(''); 
     } else {
@@ -332,6 +340,7 @@ const ImageGeneratorApp = () => {
       {isAuthenticated && showTechEffect && <TechEffect animationKey={techEffectKey} onAnimationEnd={() => setShowTechEffect(false)} />}
       {isAuthenticated && showMusicVibes && <MusicVibes animationKey={musicVibesKey} onAnimationEnd={() => setShowMusicVibes(false)} />}
       {isAuthenticated && showAccessDeniedEffect && <AccessDeniedEffect animationKey={accessDeniedEffectKey} onAnimationEnd={() => setShowAccessDeniedEffect(false)} />}
+      {isAuthenticated && showMoneyAnimation && <MoneyRain animationKey={moneyAnimationKey} onAnimationEnd={() => setShowMoneyAnimation(false)} />}
             
       <Card className="relative z-10 w-full max-w-3xl bg-card/90 backdrop-blur-sm shadow-2xl shadow-primary/30 rounded-xl">
         {!isAuthenticated ? (
@@ -634,4 +643,3 @@ const ImageGeneratorApp = () => {
 
 export default ImageGeneratorApp;
     
-
