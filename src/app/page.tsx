@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -9,6 +10,9 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 const isValidImageUrl = (url: string): boolean => {
@@ -16,8 +20,15 @@ const isValidImageUrl = (url: string): boolean => {
   return url.match(/\.(jpeg|jpg|gif|png|webp)$/i) != null || url.startsWith('data:image');
 };
 
+type InputMode = 'url' | 'title_prompt' | 'prompt_only';
+
 const ImageGeneratorApp = () => {
-  const [promptInput, setPromptInput] = useState('');
+  const [inputMode, setInputMode] = useState<InputMode>('prompt_only');
+  const [urlInput, setUrlInput] = useState('');
+  const [titleInput, setTitleInput] = useState('');
+  const [promptForTitleInput, setPromptForTitleInput] = useState('');
+  const [singlePromptInput, setSinglePromptInput] = useState('');
+  
   const [displayList, setDisplayList] = useState<DisplayItem[]>([]);
   const [processingJobs, setProcessingJobs] = useState<PromptJob[]>([]);
   const [selectedStyleValue, setSelectedStyleValue] = useState<string>(artStyles[0].value);
@@ -32,7 +43,7 @@ const ImageGeneratorApp = () => {
          // Batch finished
       }
       if (isBatchProcessing) {
-        setIsBatchProcessing(false); // Ensure it stops if queue is empty or done
+        setIsBatchProcessing(false); 
       }
       return;
     }
@@ -44,7 +55,6 @@ const ImageGeneratorApp = () => {
         const updateToProcessing = (items: PromptJob[]) => items.map(item => 
             item.id === currentJob.id ? { ...item, status: 'processing' as const } : item
         );
-        // Also update displayList for PromptJob items
         setDisplayList(prevDisplayList => prevDisplayList.map(dItem => 
             dItem.id === currentJob.id && dItem.type === 'prompt' ? { ...dItem, status: 'processing' as const } : dItem
         ));
@@ -72,61 +82,62 @@ const ImageGeneratorApp = () => {
 
 
   const handleStartBatchProcessing = () => {
-    const allLines = promptInput.split('\n');
-    const nonEmptyLines = allLines.map(line => line.trim()).filter(line => line !== '');
-    
-    if (nonEmptyLines.length === 0) {
-        alert("Por favor, ingresa algún contenido para procesar.");
-        return;
-    }
-
     const newDisplayList: DisplayItem[] = [];
     const newProcessingJobs: PromptJob[] = [];
     const currentArtStyle = artStyles.find(style => style.value === selectedStyleValue) || artStyles[0];
+    const uniqueIdBase = Date.now();
+    let currentIdOffset = 0;
 
-    if (nonEmptyLines.length === 1) {
-        const line = nonEmptyLines[0];
-        const uniqueId = Date.now();
-        if (isValidImageUrl(line)) {
-            newDisplayList.push({ id: uniqueId, type: 'external_image', imageUrl: line });
-        } else {
-            const styledPrompt = `${line}${currentArtStyle.promptSuffix}`;
-            const promptJob: PromptJob = {
-                id: uniqueId, type: 'prompt', originalPrompt: line, styledPrompt, status: 'pending',
-                imageUrl: null, error: null, artStyleUsed: currentArtStyle.name,
-            };
-            newDisplayList.push(promptJob);
-            newProcessingJobs.push(promptJob);
+    const getUniqueId = () => uniqueIdBase + currentIdOffset++;
+
+    switch (inputMode) {
+      case 'url':
+        if (!urlInput.trim()) {
+          alert("Por favor, ingresa una URL.");
+          return;
         }
-    } 
-    else {
-        let promptCounter = 0;
-        nonEmptyLines.slice(0, MAX_PROMPTS_OVERALL).forEach((line, index) => {
-            const uniqueId = Date.now() + index;
-            const wordCount = line.split(/\s+/).filter(Boolean).length;
-            
-            if (isValidImageUrl(line)) {
-                newDisplayList.push({ id: uniqueId, type: 'external_image', imageUrl: line });
-            } else if (wordCount <= TITLE_WORD_THRESHOLD) {
-                newDisplayList.push({ id: uniqueId, type: 'title_comment', text: line });
-            } else {
-                if (promptCounter < MAX_PROCESSING_JOBS) {
-                    const styledPrompt = `${line}${currentArtStyle.promptSuffix}`;
-                    const promptJob: PromptJob = {
-                        id: uniqueId, type: 'prompt', originalPrompt: line, styledPrompt, status: 'pending',
-                        imageUrl: null, error: null, artStyleUsed: currentArtStyle.name,
-                    };
-                    newDisplayList.push(promptJob);
-                    newProcessingJobs.push(promptJob);
-                    promptCounter++;
-                } else {
-                    newDisplayList.push({
-                        id: uniqueId, type: 'skipped_prompt', text: line,
-                        reason: `Límite de ${MAX_PROCESSING_JOBS} prompts para generación con IA alcanzado.`,
-                    });
-                }
-            }
-        });
+        if (isValidImageUrl(urlInput)) {
+          newDisplayList.push({ id: getUniqueId(), type: 'external_image', imageUrl: urlInput });
+        } else {
+          newDisplayList.push({
+            id: getUniqueId(), type: 'skipped_prompt', text: urlInput,
+            reason: `La URL proporcionada no es una imagen válida o no es accesible.`,
+          });
+        }
+        break;
+
+      case 'title_prompt':
+        if (!titleInput.trim() && !promptForTitleInput.trim()) {
+          alert("Por favor, ingresa un título o un prompt.");
+          return;
+        }
+        if (titleInput.trim()) {
+          newDisplayList.push({ id: getUniqueId(), type: 'title_comment', text: titleInput.trim() });
+        }
+        if (promptForTitleInput.trim()) {
+          const styledPrompt = `${promptForTitleInput.trim()}${currentArtStyle.promptSuffix}`;
+          const promptJob: PromptJob = {
+            id: getUniqueId(), type: 'prompt', originalPrompt: promptForTitleInput.trim(), styledPrompt, status: 'pending',
+            imageUrl: null, error: null, artStyleUsed: currentArtStyle.name,
+          };
+          newDisplayList.push(promptJob);
+          newProcessingJobs.push(promptJob);
+        }
+        break;
+
+      case 'prompt_only':
+        if (!singlePromptInput.trim()) {
+          alert("Por favor, ingresa un prompt.");
+          return;
+        }
+        const styledPrompt = `${singlePromptInput.trim()}${currentArtStyle.promptSuffix}`;
+        const promptJob: PromptJob = {
+          id: getUniqueId(), type: 'prompt', originalPrompt: singlePromptInput.trim(), styledPrompt, status: 'pending',
+          imageUrl: null, error: null, artStyleUsed: currentArtStyle.name,
+        };
+        newDisplayList.push(promptJob);
+        newProcessingJobs.push(promptJob);
+        break;
     }
     
     setDisplayList(newDisplayList);
@@ -157,7 +168,7 @@ const ImageGeneratorApp = () => {
         const item = imagesToDownload[i];
         try {
             const link = document.createElement('a');
-            link.href = item.imageUrl!; // Already checked it's not null
+            link.href = item.imageUrl!; 
             
             const sanitizedPrompt = item.originalPrompt.replace(/[^a-z0-9]/gi, '_').substring(0, 30);
             const filename = `ia_imagen_${i + 1}_${item.artStyleUsed ? item.artStyleUsed.split(' ')[0].toLowerCase() + '_' : ''}${sanitizedPrompt || 'prompt'}.png`;
@@ -191,6 +202,19 @@ const ImageGeneratorApp = () => {
   const canDownloadGenerated = !isBatchProcessing && displayList.some(item => item.type === 'prompt' && item.status === 'completed' && item.imageUrl && item.imageUrl.startsWith('data:image'));
   const currentSelectedArtStyleObj = artStyles.find(s => s.value === selectedStyleValue);
 
+  const isInputEmpty = () => {
+    switch (inputMode) {
+      case 'url':
+        return !urlInput.trim();
+      case 'title_prompt':
+        return !titleInput.trim() && !promptForTitleInput.trim();
+      case 'prompt_only':
+        return !singlePromptInput.trim();
+      default:
+        return true;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center p-4 font-body relative overflow-hidden">
       <FuturisticBackground />
@@ -199,35 +223,110 @@ const ImageGeneratorApp = () => {
           <div className="flex items-center justify-center mb-2">
             <Sparkles className="text-accent w-10 h-10 mr-3" />
             <CardTitle className="text-3xl md:text-4xl font-headline tracking-tight bg-gradient-to-r from-accent via-primary to-accent text-transparent bg-clip-text">
-              Generador de Arte IA (Lotes)
+              Generador de Arte IA
             </CardTitle>
           </div>
           <CardDescription className="text-muted-foreground text-sm md:text-base">
-            Una sola línea siempre es un prompt. Con varias, los párrafos cortos (≤{TITLE_WORD_THRESHOLD} palabras) son títulos.
+            Elige cómo quieres ingresar tu idea: mediante una URL de imagen existente, un título y un prompt detallado, o solo un prompt. Luego, selecciona un estilo de arte y ¡deja que la IA cree!
           </CardDescription>
         </CardHeader>
 
         <CardContent>
           <main>
             <div className="mb-6">
-              <label htmlFor="promptInput" className="block mb-2 text-sm font-medium text-accent">
-                Tus URLs, Títulos y Prompts:
-              </label>
-              <Textarea
-                id="promptInput"
-                rows={5}
-                className="w-full p-3 bg-background/70 border-primary border-2 rounded-lg focus-visible:ring-accent focus-visible:border-accent transition-all duration-300 ease-in-out placeholder:text-muted-foreground resize-y"
-                placeholder={"Un solo prompt para generar una imagen...\n\nO...\n\nUn Título\nUn prompt más largo\nOtro Título\nhttps://placehold.co/600x400.png"}
-                value={promptInput}
-                onChange={(e) => setPromptInput(e.target.value)}
+              <Label className="block mb-3 text-sm font-medium text-accent">Elige el tipo de entrada:</Label>
+              <RadioGroup
+                value={inputMode}
+                onValueChange={(value: string) => setInputMode(value as InputMode)}
+                className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0 mb-4"
                 disabled={isBatchProcessing || isDownloadingIndividual}
-              />
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="url" id="mode_url" />
+                  <Label htmlFor="mode_url" className="flex items-center cursor-pointer"><LinkIcon size={16} className="mr-2 text-primary"/> URL de Imagen</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="title_prompt" id="mode_title_prompt" />
+                  <Label htmlFor="mode_title_prompt" className="flex items-center cursor-pointer"><Type size={16} className="mr-2 text-primary"/> Título + Prompt</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="prompt_only" id="mode_prompt_only" />
+                  <Label htmlFor="mode_prompt_only" className="flex items-center cursor-pointer"><MessageSquareText size={16} className="mr-2 text-primary"/> Solo Prompt</Label>
+                </div>
+              </RadioGroup>
             </div>
 
+            {inputMode === 'url' && (
+              <div className="mb-6">
+                <Label htmlFor="urlInput" className="block mb-2 text-sm font-medium text-accent">
+                  URL de la Imagen:
+                </Label>
+                <Input
+                  id="urlInput"
+                  type="url"
+                  className="w-full p-3 bg-background/70 border-primary border-2 rounded-lg focus-visible:ring-accent focus-visible:border-accent transition-all duration-300 ease-in-out placeholder:text-muted-foreground"
+                  placeholder="https://ejemplo.com/imagen.png"
+                  value={urlInput}
+                  onChange={(e) => setUrlInput(e.target.value)}
+                  disabled={isBatchProcessing || isDownloadingIndividual}
+                />
+              </div>
+            )}
+
+            {inputMode === 'title_prompt' && (
+              <>
+                <div className="mb-6">
+                  <Label htmlFor="titleInput" className="block mb-2 text-sm font-medium text-accent">
+                    Título (opcional):
+                  </Label>
+                  <Input
+                    id="titleInput"
+                    type="text"
+                    className="w-full p-3 bg-background/70 border-primary border-2 rounded-lg focus-visible:ring-accent focus-visible:border-accent transition-all duration-300 ease-in-out placeholder:text-muted-foreground"
+                    placeholder="Mi increíble título"
+                    value={titleInput}
+                    onChange={(e) => setTitleInput(e.target.value)}
+                    disabled={isBatchProcessing || isDownloadingIndividual}
+                  />
+                </div>
+                <div className="mb-6">
+                  <Label htmlFor="promptForTitleInput" className="block mb-2 text-sm font-medium text-accent">
+                    Prompt:
+                  </Label>
+                  <Textarea
+                    id="promptForTitleInput"
+                    rows={3}
+                    className="w-full p-3 bg-background/70 border-primary border-2 rounded-lg focus-visible:ring-accent focus-visible:border-accent transition-all duration-300 ease-in-out placeholder:text-muted-foreground resize-y"
+                    placeholder="Descripción detallada para la IA..."
+                    value={promptForTitleInput}
+                    onChange={(e) => setPromptForTitleInput(e.target.value)}
+                    disabled={isBatchProcessing || isDownloadingIndividual}
+                  />
+                </div>
+              </>
+            )}
+
+            {inputMode === 'prompt_only' && (
+              <div className="mb-6">
+                <Label htmlFor="singlePromptInput" className="block mb-2 text-sm font-medium text-accent">
+                  Tu Prompt:
+                </Label>
+                <Textarea
+                  id="singlePromptInput"
+                  rows={5}
+                  className="w-full p-3 bg-background/70 border-primary border-2 rounded-lg focus-visible:ring-accent focus-visible:border-accent transition-all duration-300 ease-in-out placeholder:text-muted-foreground resize-y"
+                  placeholder="Un gato cibernético en una ciudad lluviosa de neón..."
+                  value={singlePromptInput}
+                  onChange={(e) => setSinglePromptInput(e.target.value)}
+                  disabled={isBatchProcessing || isDownloadingIndividual}
+                />
+              </div>
+            )}
+
             <div className="mb-6">
-              <label htmlFor="artStyle" className="block mb-2 text-sm font-medium text-accent flex items-center">
+              <Label htmlFor="artStyle" className="block mb-2 text-sm font-medium text-accent flex items-center">
                 <Palette size={18} className="mr-2"/> Selecciona Estilo de Arte para IA:
-              </label>
+              </Label>
               <Select 
                 value={selectedStyleValue} 
                 onValueChange={setSelectedStyleValue}
@@ -250,7 +349,7 @@ const ImageGeneratorApp = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <Button
                 onClick={handleStartBatchProcessing}
-                disabled={isBatchProcessing || !promptInput.trim() || isDownloadingIndividual}
+                disabled={isBatchProcessing || isInputEmpty() || isDownloadingIndividual}
                 className="w-full text-white font-semibold py-3 px-4 text-lg focus:ring-4 focus:ring-accent/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:bg-primary/90 bg-primary"
               >
                 {isBatchProcessing ? <><Loader2 className="w-6 h-6 mr-2 animate-spin" /> Procesando IA...</> : <><ListChecks className="w-6 h-6 mr-2" /> Analizar y Procesar</>}
@@ -271,13 +370,13 @@ const ImageGeneratorApp = () => {
             )}
             {!isBatchProcessing && displayList.length > 0 && processingJobs.length > 0 && currentJobIndexInQueue !== null && currentJobIndexInQueue >= processingJobs.length && (
                   <div className="mt-6 p-3 text-green-700 bg-green-500/20 rounded-md text-center text-sm font-semibold">
-                      ¡Procesamiento IA del lote completado!
+                      ¡Procesamiento IA completado!
                   </div>
             )}
             
             {displayList.length > 0 && (
               <div className="mt-8 space-y-4">
-                <h3 className="text-xl font-headline text-accent border-b-2 border-primary pb-2 mb-4">Resultados del Lote:</h3>
+                <h3 className="text-xl font-headline text-accent border-b-2 border-primary pb-2 mb-4">Resultados:</h3>
                 {displayList.map((item) => (
                   <div key={item.id} className="p-4 rounded-lg bg-card/75 border border-primary shadow-md">
                     {item.type === 'title_comment' && ( 
@@ -312,7 +411,7 @@ const ImageGeneratorApp = () => {
                     )}
                     {item.type === 'skipped_prompt' && (
                       <div>
-                          <p className="font-semibold text-sm text-yellow-500 mb-1">Prompt IA Omitido: <span className="text-muted-foreground font-normal">{item.text}</span></p>
+                          <p className="font-semibold text-sm text-yellow-500 mb-1">Entrada Omitida: <span className="text-muted-foreground font-normal">{item.text}</span></p>
                           <p className="text-xs text-yellow-600">{item.reason}</p>
                       </div>
                     )}
@@ -320,7 +419,7 @@ const ImageGeneratorApp = () => {
                       <div>
                         <p className="font-semibold text-sm text-accent mb-1">
                           <MessageSquareText size={18} className="inline mr-2 align-text-bottom" />
-                          Prompt IA ({item.artStyleUsed || 'Estilo no especificado'}) {processingJobs.findIndex(p => p.id === item.id) + 1}: <span className="text-foreground font-normal">{item.originalPrompt}</span>
+                          Prompt IA ({item.artStyleUsed || 'Estilo no especificado'}) {processingJobs.findIndex(p => p.id === item.id) >=0 ? `(${processingJobs.findIndex(p => p.id === item.id) + 1}/${processingJobs.length})` : ''}: <span className="text-foreground font-normal">{item.originalPrompt}</span>
                         </p>
                         {item.status === 'pending' && <p className="text-sm text-yellow-500 flex items-center mt-2"><Info size={16} className="mr-1"/> Pendiente IA...</p>}
                         {item.status === 'processing' && <p className="text-sm text-blue-500 flex items-center mt-2"><Loader2 size={16} className="mr-1 animate-spin"/> Procesando IA...</p>}
@@ -354,3 +453,5 @@ const ImageGeneratorApp = () => {
 };
 
 export default ImageGeneratorApp;
+
+    
