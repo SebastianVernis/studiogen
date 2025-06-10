@@ -278,7 +278,7 @@ const ImageGeneratorApp = () => {
           <div className="flex items-center justify-center mb-2">
             <Sparkles className="text-accent w-10 h-10 mr-3" />
             <CardTitle className="text-3xl md:text-4xl font-headline tracking-tight bg-gradient-to-r from-accent via-primary to-accent text-transparent bg-clip-text">
-              ArtBot Batch
+              Chispart Generator
             </CardTitle>
           </div>
           <CardDescription className="text-muted-foreground text-sm md:text-base">
