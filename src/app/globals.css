@@ -92,3 +92,26 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  @keyframes float-up-fade {
+    0% {
+      transform: translateY(20px) scale(0.5);
+      opacity: 0;
+    }
+    20%, 70% { /* Adjusted to make hearts visible longer and start fading a bit earlier */
+      opacity: 1;
+      transform: translateY(0px) scale(1);
+    }
+    100% {
+      transform: translateY(-60px) scale(0.7); /* Reduced upward travel and scale */
+      opacity: 0;
+    }
+  }
+
+  .animate-float-up-fade {
+    animation-name: float-up-fade;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+  }
+}

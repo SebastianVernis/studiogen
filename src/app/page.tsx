@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile } from 'lucide-react';
+import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart } from 'lucide-react';
 import FuturisticBackground from '@/components/futuristic-background';
 import { artStyles, MAX_PROMPTS_OVERALL, MAX_PROCESSING_JOBS, DOWNLOAD_DELAY_MS, type DisplayItem, type PromptJob, type ArtStyle } from '@/lib/artbot-config';
 import { generateImageFromPrompt } from '@/ai/flows/generate-image-from-prompt';
@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import HeartRain from '@/components/ui/heart-rain';
 
 const isValidImageUrl = (url: string): boolean => {
   if (!url || typeof url !== 'string') return false;
@@ -34,6 +35,9 @@ const ImageGeneratorApp = () => {
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState('');
   const [greetingMessage, setGreetingMessage] = useState('');
+  const [showHeartAnimation, setShowHeartAnimation] = useState(false);
+  const [heartAnimationKey, setHeartAnimationKey] = useState(0);
+
 
   const [inputMode, setInputMode] = useState<InputMode>('prompt_only');
   const [urlInput, setUrlInput] = useState('');
@@ -56,10 +60,17 @@ const ImageGeneratorApp = () => {
       setIsAuthenticated(true);
       setGreetingMessage(greeting);
       setAuthError('');
+      if (passwordInput === "Patrona1") {
+        setShowHeartAnimation(true);
+        setHeartAnimationKey(Date.now()); // Change key to re-trigger animation
+      } else {
+        setShowHeartAnimation(false);
+      }
       setPasswordInput(''); 
     } else {
       setAuthError('Contraseña incorrecta. Inténtalo de nuevo.');
       setGreetingMessage('');
+      setShowHeartAnimation(false);
     }
   };
 
@@ -334,6 +345,9 @@ const ImageGeneratorApp = () => {
           </>
         ) : (
           <>
+            {showHeartAnimation && greetingMessage.includes("amor de mi vida") && (
+              <HeartRain animationKey={heartAnimationKey} onAnimationEnd={() => setShowHeartAnimation(false)} />
+            )}
             <CardHeader className="text-center">
               {greetingMessage && (
                 <div className="mb-4 p-3 bg-primary/10 border border-primary/30 rounded-lg text-center">
