@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn } from 'lucide-react';
+import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile } from 'lucide-react';
 import FuturisticBackground from '@/components/futuristic-background';
 import { artStyles, MAX_PROMPTS_OVERALL, MAX_PROCESSING_JOBS, DOWNLOAD_DELAY_MS, type DisplayItem, type PromptJob, type ArtStyle } from '@/lib/artbot-config';
 import { generateImageFromPrompt } from '@/ai/flows/generate-image-from-prompt';
@@ -22,14 +22,18 @@ const isValidImageUrl = (url: string): boolean => {
 
 type InputMode = 'url' | 'title_prompt' | 'prompt_only';
 
-// IMPORTANT: In a real application, this password should NOT be hardcoded in the frontend.
-// It should be handled by a secure backend authentication system.
-const CORRECT_PASSWORD = "supersecretpassword"; // Change this to your desired password
+const passwordGreetings: Record<string, string> = {
+  "Chispart123": "Hola, Amo.",
+  "Patrona1": "Hola, amor de mi vida",
+  "ChispukAdmin": "El que no baila no opina",
+  "supersecretpassword": "¿Tú qué haces aquí? ¡LARGO!"
+};
 
 const ImageGeneratorApp = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState('');
+  const [greetingMessage, setGreetingMessage] = useState('');
 
   const [inputMode, setInputMode] = useState<InputMode>('prompt_only');
   const [urlInput, setUrlInput] = useState('');
@@ -47,12 +51,15 @@ const ImageGeneratorApp = () => {
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput === CORRECT_PASSWORD) {
+    const greeting = passwordGreetings[passwordInput];
+    if (greeting) {
       setIsAuthenticated(true);
+      setGreetingMessage(greeting);
       setAuthError('');
-      setPasswordInput(''); // Clear password input after successful login
+      setPasswordInput(''); 
     } else {
       setAuthError('Contraseña incorrecta. Inténtalo de nuevo.');
+      setGreetingMessage('');
     }
   };
 
@@ -328,6 +335,13 @@ const ImageGeneratorApp = () => {
         ) : (
           <>
             <CardHeader className="text-center">
+              {greetingMessage && (
+                <div className="mb-4 p-3 bg-primary/10 border border-primary/30 rounded-lg text-center">
+                  <p className="text-lg font-medium text-primary flex items-center justify-center">
+                    <Smile size={22} className="mr-2 text-accent" /> {greetingMessage}
+                  </p>
+                </div>
+              )}
               <div className="flex items-center justify-center mb-2">
                 <Sparkles className="text-accent w-10 h-10 mr-3" />
                 <CardTitle className="text-3xl md:text-4xl font-headline tracking-tight bg-gradient-to-r from-accent via-primary to-accent text-transparent bg-clip-text">
@@ -578,3 +592,4 @@ const ImageGeneratorApp = () => {
 
 export default ImageGeneratorApp;
     
+
