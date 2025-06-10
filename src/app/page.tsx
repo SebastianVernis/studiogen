@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart } from 'lucide-react';
+import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart, Cpu, CircuitBoard, Music2, Disc3, ActivitySquare, Ban, AlertOctagon } from 'lucide-react';
 import FuturisticBackground from '@/components/futuristic-background';
 import { artStyles, MAX_PROMPTS_OVERALL, MAX_PROCESSING_JOBS, DOWNLOAD_DELAY_MS, type DisplayItem, type PromptJob, type ArtStyle } from '@/lib/artbot-config';
 import { generateImageFromPrompt } from '@/ai/flows/generate-image-from-prompt';
@@ -15,6 +15,10 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import HeartRain from '@/components/ui/heart-rain';
+import TechEffect from '@/components/ui/tech-effect';
+import MusicVibes from '@/components/ui/music-vibes';
+import AccessDeniedEffect from '@/components/ui/access-denied-effect';
+
 
 const isValidImageUrl = (url: string): boolean => {
   if (!url || typeof url !== 'string') return false;
@@ -35,8 +39,15 @@ const ImageGeneratorApp = () => {
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState('');
   const [greetingMessage, setGreetingMessage] = useState('');
+
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
   const [heartAnimationKey, setHeartAnimationKey] = useState(0);
+  const [showTechEffect, setShowTechEffect] = useState(false);
+  const [techEffectKey, setTechEffectKey] = useState(0);
+  const [showMusicVibes, setShowMusicVibes] = useState(false);
+  const [musicVibesKey, setMusicVibesKey] = useState(0);
+  const [showAccessDeniedEffect, setShowAccessDeniedEffect] = useState(false);
+  const [accessDeniedEffectKey, setAccessDeniedEffectKey] = useState(0);
 
 
   const [inputMode, setInputMode] = useState<InputMode>('prompt_only');
@@ -53,24 +64,39 @@ const ImageGeneratorApp = () => {
   const [currentJobIndexInQueue, setCurrentJobIndexInQueue] = useState<number | null>(null);
   const [isDownloadingIndividual, setIsDownloadingIndividual] = useState(false);
 
+  const resetAnimations = () => {
+    setShowHeartAnimation(false);
+    setShowTechEffect(false);
+    setShowMusicVibes(false);
+    setShowAccessDeniedEffect(false);
+  };
+
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    resetAnimations(); // Reset all animations first
     const greeting = passwordGreetings[passwordInput];
     if (greeting) {
       setIsAuthenticated(true);
       setGreetingMessage(greeting);
       setAuthError('');
+
       if (passwordInput === "Patrona1") {
         setShowHeartAnimation(true);
-        setHeartAnimationKey(Date.now()); // Change key to re-trigger animation
-      } else {
-        setShowHeartAnimation(false);
+        setHeartAnimationKey(Date.now());
+      } else if (passwordInput === "Chispart123") {
+        setShowTechEffect(true);
+        setTechEffectKey(Date.now());
+      } else if (passwordInput === "ChispukAdmin") {
+        setShowMusicVibes(true);
+        setMusicVibesKey(Date.now());
+      } else if (passwordInput === "supersecretpassword") {
+        setShowAccessDeniedEffect(true);
+        setAccessDeniedEffectKey(Date.now());
       }
       setPasswordInput(''); 
     } else {
       setAuthError('Contraseña incorrecta. Inténtalo de nuevo.');
       setGreetingMessage('');
-      setShowHeartAnimation(false);
     }
   };
 
@@ -345,9 +371,11 @@ const ImageGeneratorApp = () => {
           </>
         ) : (
           <>
-            {showHeartAnimation && greetingMessage.includes("amor de mi vida") && (
-              <HeartRain animationKey={heartAnimationKey} onAnimationEnd={() => setShowHeartAnimation(false)} />
-            )}
+            {showHeartAnimation && <HeartRain animationKey={heartAnimationKey} onAnimationEnd={() => setShowHeartAnimation(false)} />}
+            {showTechEffect && <TechEffect animationKey={techEffectKey} onAnimationEnd={() => setShowTechEffect(false)} />}
+            {showMusicVibes && <MusicVibes animationKey={musicVibesKey} onAnimationEnd={() => setShowMusicVibes(false)} />}
+            {showAccessDeniedEffect && <AccessDeniedEffect animationKey={accessDeniedEffectKey} onAnimationEnd={() => setShowAccessDeniedEffect(false)} />}
+            
             <CardHeader className="text-center">
               {greetingMessage && (
                 <div className="mb-4 p-3 bg-primary/10 border border-primary/30 rounded-lg text-center">
