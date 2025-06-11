@@ -2,10 +2,11 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart, Cpu, CircuitBoard, Music2, Disc3, ActivitySquare, Ban, AlertOctagon, Code2, DollarSign, Landmark, CreditCard, Shield, ShieldCheck, LogOut, Menu as MenuIcon, Moon, Sun, GlobeLock, CheckCircle } from 'lucide-react';
+import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart, Cpu, CircuitBoard, Music2, Disc3, ActivitySquare, Ban, AlertOctagon, Code2, DollarSign, Landmark, CreditCard, Shield, ShieldCheck, LogOut, Menu as MenuIcon, Moon, Sun, GlobeLock, CheckCircle, Wand2 } from 'lucide-react';
 import FuturisticBackground from '@/components/futuristic-background';
 import { artStyles, MAX_PROMPTS_OVERALL, MAX_PROCESSING_JOBS, DOWNLOAD_DELAY_MS, type DisplayItem, type PromptJob, type ArtStyle } from '@/lib/artbot-config';
 import { generateImageFromPrompt } from '@/ai/flows/generate-image-from-prompt';
+import { refineImage } from '@/ai/flows/refine-image-flow';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -21,6 +22,7 @@ import TechEffect from '@/components/ui/tech-effect';
 import MusicVibes from '@/components/ui/music-vibes';
 import AccessDeniedEffect from '@/components/ui/access-denied-effect';
 import MoneyRain from '@/components/ui/money-rain';
+import { useToast } from "@/hooks/use-toast";
 
 
 const isValidImageUrl = (url: string): boolean => {
@@ -38,6 +40,7 @@ type PasswordConfig = {
 };
 
 const ImageGeneratorApp = () => {
+  const { toast } = useToast();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState('');
@@ -73,13 +76,9 @@ const ImageGeneratorApp = () => {
   }, []);
 
   useEffect(() => {
-    // Initialize app state if password protection is globally disabled
-    // This effect runs on mount and when isPasswordProtectionGloballyDisabled changes.
     if (isPasswordProtectionGloballyDisabled && !currentUserIsAdmin && !isAuthenticated) {
-      // If protection is off, and no admin is logged in, and not already "authenticated" by this mode
-      setIsAuthenticated(true); // Grant access to the app content
+      setIsAuthenticated(true); 
       setGreetingMessage("Modo de Acceso Abierto. Funcionalidad completa disponible.");
-      // No specific user animation
     }
      setGlobalProtectionButtonText(
       isPasswordProtectionGloballyDisabled ? "Activar Protección Global" : "Desactivar Protección Global"
@@ -157,6 +156,10 @@ const ImageGeneratorApp = () => {
   const [currentJobIndexInQueue, setCurrentJobIndexInQueue] = useState<number | null>(null);
   const [isDownloadingIndividual, setIsDownloadingIndividual] = useState(false);
 
+  const [itemBeingRefined, setItemBeingRefined] = useState<PromptJob | null>(null);
+  const [refinementPromptText, setRefinementPromptText] = useState<string>('');
+  const [isSubmittingRefinement, setIsSubmittingRefinement] = useState<boolean>(false);
+
   const resetAnimations = () => {
     setShowHeartAnimation(false);
     setShowTechEffect(false);
@@ -171,14 +174,13 @@ const ImageGeneratorApp = () => {
     const submittedPassword = passwordInput; 
     const config = allPasswordConfigs[submittedPassword];
 
-    if (showDirectAdminLogin) { // This mode is only for "Chispart123"
+    if (showDirectAdminLogin) { 
       if (submittedPassword === "Chispart123" && allPasswordConfigs["Chispart123"]) {
         setIsAuthenticated(true);
         setGreetingMessage(allPasswordConfigs["Chispart123"].greeting);
         allPasswordConfigs["Chispart123"].animation();
         setCurrentUserIsAdmin(true); 
         setAuthError('');
-        //setShowDirectAdminLogin(false); // Keep it true if we want to indicate "admin mode"
       } else {
         setAuthError('Contraseña de administrador incorrecta.');
         setGreetingMessage('');
@@ -188,14 +190,13 @@ const ImageGeneratorApp = () => {
       return;
     }
 
-    // Normal login flow (when global protection is ON)
     if (config && config.isEnabledGlobal) {
       setIsAuthenticated(true);
       setGreetingMessage(config.greeting);
       config.animation();
       setCurrentUserIsAdmin(!!config.isAdmin);
       setAuthError('');
-      setIsAdminPanelVisible(false); // Hide panel on new login, admin can reopen
+      setIsAdminPanelVisible(false); 
     } else {
       setAuthError('Contraseña incorrecta o deshabilitada.');
       setGreetingMessage('');
@@ -209,25 +210,23 @@ const ImageGeneratorApp = () => {
     setIsAdminPanelVisible(false);
     
     const isAdminLoggingOut = currentUserIsAdmin;
-    setCurrentUserIsAdmin(false); // Always reset admin status
+    setCurrentUserIsAdmin(false); 
 
-    // Reset UI states for login form
     setPasswordInput('');
     setAuthError('');
     setShowDirectAdminLogin(false);
 
-    // Reset app-specific states
     setDisplayList([]);
     setProcessingJobs([]);
     setIsBatchProcessing(false);
     setCurrentJobIndexInQueue(null);
+    setItemBeingRefined(null);
+    setRefinementPromptText('');
 
     if (isPasswordProtectionGloballyDisabled && isAdminLoggingOut) {
-        // Admin logged out, but global protection is off, so revert to open access mode
         setIsAuthenticated(true); 
         setGreetingMessage("Modo de Acceso Abierto. Funcionalidad completa disponible.");
     } else {
-        // Normal user logout, or admin logout when global protection is ON
         setIsAuthenticated(false); 
         setGreetingMessage('');
     }
@@ -243,18 +242,14 @@ const ImageGeneratorApp = () => {
   const handleToggleGlobalProtection = () => {
     setIsPasswordProtectionGloballyDisabled(prev => {
       const newState = !prev;
-      if (newState) { // Protection is being DISABLED
-        // If the admin is currently logged in, their session remains.
-        // If no one is logged in, or a normal user was, this will grant open access on next render cycle.
-        if (!currentUserIsAdmin) { // If an admin is not already logged in
-            setIsAuthenticated(true); // Grant open access
+      if (newState) { 
+        if (!currentUserIsAdmin) { 
+            setIsAuthenticated(true); 
             setGreetingMessage("Modo de Acceso Abierto. Funcionalidad completa disponible.");
         }
-      } else { // Protection is being ENABLED
-        // If an admin is logged in, their session remains.
-        // If it was in open access mode, now it requires login.
-        if (!currentUserIsAdmin) { // If an admin is not already logged in
-            setIsAuthenticated(false); // Require login
+      } else { 
+        if (!currentUserIsAdmin) { 
+            setIsAuthenticated(false); 
             setGreetingMessage("");
         }
       }
@@ -313,7 +308,7 @@ const ImageGeneratorApp = () => {
 
   const handleAddItemToQueue = () => {
     if (displayList.length >= MAX_PROMPTS_OVERALL) {
-      alert(`No puedes agregar más de ${MAX_PROMPTS_OVERALL} elementos en total a la cola.`);
+      toast({ title: "Límite Alcanzado", description: `No puedes agregar más de ${MAX_PROMPTS_OVERALL} elementos en total.`, variant: "destructive" });
       return;
     }
 
@@ -326,7 +321,7 @@ const ImageGeneratorApp = () => {
     switch (inputMode) {
       case 'url':
         if (!urlInput.trim()) {
-          alert("Por favor, ingresa una URL.");
+          toast({ title: "Entrada Requerida", description: "Por favor, ingresa una URL.", variant: "destructive" });
           return;
         }
         if (isValidImageUrl(urlInput)) {
@@ -341,7 +336,7 @@ const ImageGeneratorApp = () => {
 
       case 'title_prompt':
         if (!titleInput.trim() && !promptForTitleInput.trim()) {
-          alert("Por favor, ingresa un título o un prompt.");
+          toast({ title: "Entrada Requerida", description: "Por favor, ingresa un título o un prompt.", variant: "destructive" });
           return;
         }
         if (titleInput.trim()) {
@@ -350,7 +345,7 @@ const ImageGeneratorApp = () => {
         if (promptForTitleInput.trim()) {
            const currentAiJobsCount = processingJobs.filter(job => job.type === 'prompt').length;
             if (currentAiJobsCount >= MAX_PROCESSING_JOBS) {
-                alert(`No puedes agregar más de ${MAX_PROCESSING_JOBS} prompts de IA a la cola para procesar en este lote.`);
+                toast({ title: "Límite de Prompts IA", description: `No puedes agregar más de ${MAX_PROCESSING_JOBS} prompts de IA a la cola para procesar.`, variant: "destructive" });
                 return; 
             }
           const styledPrompt = `${promptForTitleInput.trim()}${currentArtStyle.promptSuffix}`;
@@ -367,12 +362,12 @@ const ImageGeneratorApp = () => {
 
       case 'prompt_only':
         if (!singlePromptInput.trim()) {
-          alert("Por favor, ingresa un prompt.");
+          toast({ title: "Entrada Requerida", description: "Por favor, ingresa un prompt.", variant: "destructive" });
           return;
         }
         const currentAiJobsCount = processingJobs.filter(j => j.type === 'prompt').length;
         if (currentAiJobsCount >= MAX_PROCESSING_JOBS) {
-            alert(`No puedes agregar más de ${MAX_PROCESSING_JOBS} prompts de IA a la cola para procesar en este lote.`);
+            toast({ title: "Límite de Prompts IA", description: `No puedes agregar más de ${MAX_PROCESSING_JOBS} prompts de IA a la cola para procesar.`, variant: "destructive" });
             return;
         }
         const styledPrompt = `${singlePromptInput.trim()}${currentArtStyle.promptSuffix}`;
@@ -403,11 +398,12 @@ const ImageGeneratorApp = () => {
   const handleStartBatchProcessing = () => {
     const pendingJobs = processingJobs.filter(job => job.status === 'pending');
     if (pendingJobs.length === 0) {
-      alert("No hay prompts de IA pendientes en la cola para procesar.");
+      toast({ title: "Cola Vacía", description: "No hay prompts de IA pendientes en la cola para procesar.", variant: "destructive"});
       return;
     }
     setIsBatchProcessing(true);
     setCurrentJobIndexInQueue(0); 
+    setItemBeingRefined(null); // Cancel any active refinement UI
   };
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -418,7 +414,7 @@ const ImageGeneratorApp = () => {
     );
 
     if (imagesToDownload.length === 0) {
-        alert("No hay imágenes generadas por IA con éxito para descargar.");
+        toast({ title: "Sin Imágenes", description: "No hay imágenes generadas por IA con éxito para descargar.", variant: "destructive" });
         return;
     }
 
@@ -445,13 +441,63 @@ const ImageGeneratorApp = () => {
             }
         } catch (error) {
             console.error(`Error al descargar imagen para el prompt "${item.originalPrompt}": `, error);
-            alert(`Ocurrió un error al descargar la imagen para: "${item.originalPrompt.substring(0,50)}..."`);
+            toast({ title: "Error de Descarga", description: `Ocurrió un error al descargar la imagen para: "${item.originalPrompt.substring(0,50)}..."`, variant: "destructive" });
         }
     }
     
-    alert(`${downloadedCount} imagen(es) generada(s) por IA programada(s) para descarga.`);
+    toast({ title: "Descarga Iniciada", description: `${downloadedCount} imagen(es) generada(s) por IA programada(s) para descarga.` });
     setIsDownloadingIndividual(false);
   };
+
+  const handleStartRefinement = (item: PromptJob) => {
+    if (isBatchProcessing || isDownloadingIndividual || isSubmittingRefinement) return;
+    setItemBeingRefined(item);
+    setRefinementPromptText('');
+  };
+
+  const handleCancelRefinement = () => {
+    setItemBeingRefined(null);
+    setRefinementPromptText('');
+  };
+
+  const handleSubmitRefinement = async () => {
+    if (!itemBeingRefined || !refinementPromptText.trim() || !itemBeingRefined.imageUrl) {
+      toast({ title: "Error", description: "Se necesita la imagen original y un prompt de mejora.", variant: "destructive" });
+      return;
+    }
+    
+    setIsSubmittingRefinement(true);
+    const originalImageUri = itemBeingRefined.imageUrl;
+    const itemIdToRefine = itemBeingRefined.id;
+
+    const updateItemState = (id: number, updates: Partial<PromptJob>) => {
+      setDisplayList(prev => prev.map(dItem => dItem.id === id && dItem.type === 'prompt' ? { ...dItem, ...updates } as PromptJob : dItem));
+      setProcessingJobs(prev => prev.map(pJob => pJob.id === id && pJob.type === 'prompt' ? { ...pJob, ...updates } as PromptJob : pJob));
+    };
+
+    updateItemState(itemIdToRefine, { status: 'refining' });
+
+    try {
+      const result = await refineImage({ originalImageUri, refinementPrompt: refinementPromptText });
+      const refinedImageUri = result.refinedImageUri;
+      updateItemState(itemIdToRefine, { 
+        imageUrl: refinedImageUri, 
+        status: 'completed', 
+        // Optionally update originalPrompt to reflect refinement, or add a new field
+        // originalPrompt: `${itemBeingRefined.originalPrompt} (Mejorado: ${refinementPromptText})` 
+      });
+      toast({ title: "Éxito", description: "Imagen mejorada con éxito." });
+    } catch (err: any) {
+      const errMessage = err.message || 'Error desconocido durante la mejora.';
+      updateItemState(itemIdToRefine, { status: 'completed', error: `Mejora fallida: ${errMessage}` }); // Revert to completed with old image, show error
+      toast({ title: "Error de Mejora", description: errMessage, variant: "destructive" });
+    } finally {
+      setItemBeingRefined(null);
+      setRefinementPromptText('');
+      setIsSubmittingRefinement(false);
+    }
+  };
+
 
   const currentProcessingPromptJob = () => {
     if (isBatchProcessing && currentJobIndexInQueue !== null && currentJobIndexInQueue < processingJobs.length) {
@@ -476,26 +522,24 @@ const ImageGeneratorApp = () => {
   };
   
   const pendingAiJobsCount = processingJobs.filter(j => j.status === 'pending').length;
-  const canStartBatch = !isBatchProcessing && pendingAiJobsCount > 0 && !isDownloadingIndividual;
+  const canStartBatch = !isBatchProcessing && pendingAiJobsCount > 0 && !isDownloadingIndividual && !itemBeingRefined;
   const aiJobsInQueueCount = processingJobs.filter(j => j.type === 'prompt').length;
 
   const canAddItem = !isBatchProcessing && 
                      !isInputEmpty() && 
                      !isDownloadingIndividual && 
+                     !itemBeingRefined &&
                      displayList.length < MAX_PROMPTS_OVERALL &&
                      (inputMode !== 'prompt_only' && inputMode !== 'title_prompt' || aiJobsInQueueCount < MAX_PROCESSING_JOBS || (inputMode === 'title_prompt' && !promptForTitleInput.trim() && titleInput.trim()));
 
   const showLoginForm = !isAuthenticated && (!isPasswordProtectionGloballyDisabled || showDirectAdminLogin);
 
-  // Determine current greeting and menu options based on auth state
   let currentGreeting = greetingMessage;
   let showAdminPanelInMenu = currentUserIsAdmin;
   let showLogoutInMenu = isAuthenticated && ! (isPasswordProtectionGloballyDisabled && !currentUserIsAdmin) ;
   let showLoginAdminInMenu = isPasswordProtectionGloballyDisabled && !currentUserIsAdmin;
 
   if (isPasswordProtectionGloballyDisabled && !currentUserIsAdmin && isAuthenticated) {
-     // This case is when global protection is off, and the "isAuthenticated" is true due to open access
-     // but an admin hasn't specifically logged in yet.
     currentGreeting = "Modo de Acceso Abierto. Funcionalidad completa disponible.";
   }
 
@@ -602,7 +646,7 @@ const ImageGeneratorApp = () => {
                          {showLoginAdminInMenu && (
                             <DropdownMenuItem 
                                 onClick={() => {
-                                    setIsAuthenticated(false); // This will trigger login form
+                                    setIsAuthenticated(false); 
                                     setShowDirectAdminLogin(true);
                                     setAuthError('');
                                     setPasswordInput('');
@@ -648,7 +692,7 @@ const ImageGeneratorApp = () => {
                     value={inputMode}
                     onValueChange={(value: string) => setInputMode(value as InputMode)}
                     className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0 mb-4"
-                    disabled={isBatchProcessing || isDownloadingIndividual}
+                    disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined}
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="url" id="mode_url" />
@@ -677,7 +721,7 @@ const ImageGeneratorApp = () => {
                       placeholder="https://ejemplo.com/imagen.png"
                       value={urlInput}
                       onChange={(e) => setUrlInput(e.target.value)}
-                      disabled={isBatchProcessing || isDownloadingIndividual}
+                      disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined}
                     />
                   </div>
                 )}
@@ -695,7 +739,7 @@ const ImageGeneratorApp = () => {
                         placeholder="Mi increíble título"
                         value={titleInput}
                         onChange={(e) => setTitleInput(e.target.value)}
-                        disabled={isBatchProcessing || isDownloadingIndividual}
+                        disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined}
                       />
                     </div>
                     <div className="mb-6">
@@ -709,7 +753,7 @@ const ImageGeneratorApp = () => {
                         placeholder="Descripción detallada para la IA..."
                         value={promptForTitleInput}
                         onChange={(e) => setPromptForTitleInput(e.target.value)}
-                        disabled={isBatchProcessing || isDownloadingIndividual || (aiJobsInQueueCount >= MAX_PROCESSING_JOBS && promptForTitleInput.length > 0)}
+                        disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined || (aiJobsInQueueCount >= MAX_PROCESSING_JOBS && promptForTitleInput.length > 0)}
                       />
                        {aiJobsInQueueCount >= MAX_PROCESSING_JOBS && <p className="text-xs text-yellow-600 mt-1">Límite de prompts de IA ({MAX_PROCESSING_JOBS}) alcanzado para este lote.</p>}
                     </div>
@@ -728,7 +772,7 @@ const ImageGeneratorApp = () => {
                       placeholder="Un gato cibernético en una ciudad lluviosa de neón..."
                       value={singlePromptInput}
                       onChange={(e) => setSinglePromptInput(e.target.value)}
-                      disabled={isBatchProcessing || isDownloadingIndividual || (aiJobsInQueueCount >= MAX_PROCESSING_JOBS && singlePromptInput.length > 0)}
+                      disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined || (aiJobsInQueueCount >= MAX_PROCESSING_JOBS && singlePromptInput.length > 0)}
                     />
                     {aiJobsInQueueCount >= MAX_PROCESSING_JOBS && <p className="text-xs text-yellow-600 mt-1">Límite de prompts de IA ({MAX_PROCESSING_JOBS}) alcanzado para este lote.</p>}
                   </div>
@@ -741,7 +785,7 @@ const ImageGeneratorApp = () => {
                   <Select 
                     value={selectedStyleValue} 
                     onValueChange={setSelectedStyleValue}
-                    disabled={isBatchProcessing || isDownloadingIndividual}
+                    disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined}
                   >
                     <SelectTrigger 
                       id="artStyle"
@@ -777,7 +821,7 @@ const ImageGeneratorApp = () => {
                   </Button>
                   <Button
                     onClick={handleDownloadAllImages}
-                    disabled={!canDownloadGenerated || isDownloadingIndividual || isBatchProcessing}
+                    disabled={!canDownloadGenerated || isDownloadingIndividual || isBatchProcessing || !!itemBeingRefined}
                     className="w-full text-white font-semibold py-3 px-4 text-lg focus:ring-4 focus:ring-primary/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:bg-pink-600/90 bg-pink-500" 
                   >
                     {isDownloadingIndividual ? <><Loader2 className="w-6 h-6 mr-2 animate-spin" /> Descargando IA...</> : <><Download className="w-6 h-6 mr-2" /> Descargar Imágenes IA</>}
@@ -845,14 +889,46 @@ const ImageGeneratorApp = () => {
                             </p>
                             {item.status === 'pending' && <p className="text-sm text-yellow-500 flex items-center mt-2"><Info size={16} className="mr-1"/> Pendiente IA...</p>}
                             {item.status === 'processing' && <p className="text-sm text-blue-500 flex items-center mt-2"><Loader2 size={16} className="mr-1 animate-spin"/> Procesando IA...</p>}
-                            {item.status === 'failed' && (
+                            {item.status === 'refining' && <p className="text-sm text-purple-500 flex items-center mt-2"><Loader2 size={16} className="mr-1 animate-spin"/> Mejorando imagen IA...</p>}
+                            {item.status === 'failed' && item.error && (
                               <div className="text-sm text-destructive-foreground p-2 bg-destructive/90 rounded mt-2">
                                 <AlertTriangle size={16} className="inline mr-1" /> Error IA: {item.error}
                               </div>
                             )}
                             {item.status === 'completed' && item.imageUrl && (
-                              <div className="mt-3 p-1 border-2 border-dashed border-primary/60 rounded-md bg-background/40">
-                                <img src={item.imageUrl} alt={`Generado por IA para: ${item.originalPrompt} (${item.artStyleUsed})`} className="w-full h-auto rounded object-contain max-h-[40vh]" data-ai-hint="generated art" />
+                              <>
+                                <div className="mt-3 p-1 border-2 border-dashed border-primary/60 rounded-md bg-background/40">
+                                  <img src={item.imageUrl} alt={`Generado por IA para: ${item.originalPrompt} (${item.artStyleUsed})`} className="w-full h-auto rounded object-contain max-h-[40vh]" data-ai-hint="generated art" />
+                                </div>
+                                {!itemBeingRefined && !isBatchProcessing && !isDownloadingIndividual && (
+                                  <Button onClick={() => handleStartRefinement(item)} size="sm" variant="outline" className="mt-3 border-accent text-accent hover:bg-accent/10">
+                                    <Wand2 className="mr-2 h-4 w-4" /> Mejorar Imagen
+                                  </Button>
+                                )}
+                              </>
+                            )}
+                            {itemBeingRefined?.id === item.id && (
+                              <div className="mt-4 p-3 border border-dashed border-accent/70 rounded-lg bg-card/50">
+                                <Label htmlFor={`refine-${item.id}`} className="text-sm font-medium text-accent flex items-center mb-2">
+                                  <Wand2 size={16} className="mr-2"/> Prompt de Mejora:
+                                </Label>
+                                <Textarea
+                                  id={`refine-${item.id}`}
+                                  value={refinementPromptText}
+                                  onChange={(e) => setRefinementPromptText(e.target.value)}
+                                  placeholder="Ej: hacerlo más oscuro, añadir un gato, cambiar el color del cielo..."
+                                  rows={2}
+                                  className="my-2 bg-background/70 border-accent/50 focus-visible:border-accent"
+                                  disabled={isSubmittingRefinement}
+                                />
+                                <div className="flex gap-2 mt-2">
+                                  <Button onClick={handleSubmitRefinement} size="sm" disabled={isSubmittingRefinement || !refinementPromptText.trim()} className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                                    {isSubmittingRefinement ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : <Send className="mr-2 h-4 w-4" />} Aplicar Mejora
+                                  </Button>
+                                  <Button onClick={handleCancelRefinement} size="sm" variant="ghost" disabled={isSubmittingRefinement}>
+                                    Cancelar
+                                  </Button>
+                                </div>
                               </div>
                             )}
                           </div>
@@ -878,7 +954,7 @@ const ImageGeneratorApp = () => {
                     <ShieldCheck className="mr-3 h-7 w-7"/> Panel de Administrador
                 </CardTitle>
                 <CardDescription>
-                  Gestionar la disponibilidad de las contraseñas.
+                  Gestionar la disponibilidad de las contraseñas y el acceso global.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -888,12 +964,12 @@ const ImageGeneratorApp = () => {
                     </Label>
                     <Button
                         onClick={handleToggleGlobalProtection}
-                        variant={isPasswordProtectionGloballyDisabled ? "destructive" : "default"}
+                        variant={isPasswordProtectionGloballyDisabled ? "default" : "destructive"}
                         className="w-full"
                     >
                         {isPasswordProtectionGloballyDisabled ? 
-                            <><CheckCircle className="mr-2 h-5 w-5"/> Activar Protección Global</> : 
-                            <><Lock className="mr-2 h-5 w-5"/> Desactivar Protección Global</>
+                            <><CheckCircle className="mr-2 h-5 w-5"/> {globalProtectionButtonText}</> : 
+                            <><Lock className="mr-2 h-5 w-5"/> {globalProtectionButtonText}</>
                         }
                     </Button>
                     <p className="text-xs text-muted-foreground mt-2">
@@ -948,4 +1024,3 @@ const ImageGeneratorApp = () => {
 };
 
 export default ImageGeneratorApp;
-    

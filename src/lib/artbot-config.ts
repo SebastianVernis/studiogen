@@ -1,3 +1,4 @@
+
 export const MAX_PROMPTS_OVERALL = 50;
 export const MAX_PROCESSING_JOBS = 20;
 export const TITLE_WORD_THRESHOLD = 6;
@@ -49,7 +50,7 @@ export interface PromptJob extends DisplayItemBase {
   type: 'prompt';
   originalPrompt: string;
   styledPrompt: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'refining';
   imageUrl: string | null;
   error: string | null;
   artStyleUsed: string;
