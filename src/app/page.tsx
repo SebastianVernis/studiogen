@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart, Cpu, CircuitBoard, Music2, Disc3, ActivitySquare, Ban, AlertOctagon, Code2, DollarSign, Landmark, CreditCard, Shield, ShieldCheck, LogOut, Menu as MenuIcon, Moon, Sun, GlobeLock, CheckCircle, Wand2 } from 'lucide-react';
+import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart, Cpu, CircuitBoard, Music2, Disc3, ActivitySquare, Ban, AlertOctagon, Code2, DollarSign, Landmark, CreditCard, Shield, ShieldCheck, LogOut, Menu as MenuIcon, Moon, Sun, GlobeLock, CheckCircle, Wand2, UploadCloud } from 'lucide-react';
 import FuturisticBackground from '@/components/futuristic-background';
 import { artStyles, MAX_PROMPTS_OVERALL, MAX_PROCESSING_JOBS, DOWNLOAD_DELAY_MS, type DisplayItem, type PromptJob, type ArtStyle } from '@/lib/artbot-config';
 import { generateImageFromPrompt } from '@/ai/flows/generate-image-from-prompt';
@@ -23,6 +23,7 @@ import MusicVibes from '@/components/ui/music-vibes';
 import AccessDeniedEffect from '@/components/ui/access-denied-effect';
 import MoneyRain from '@/components/ui/money-rain';
 import { useToast } from "@/hooks/use-toast";
+import { loadGapiInsideDOM } from 'gapi-script';
 
 
 const isValidImageUrl = (url: string): boolean => {
@@ -61,6 +62,10 @@ const ImageGeneratorApp = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isPasswordProtectionGloballyDisabled, setIsPasswordProtectionGloballyDisabled] = useState(false);
   const [globalProtectionButtonText, setGlobalProtectionButtonText] = useState('');
+
+  const [googleDriveApiLoaded, setGoogleDriveApiLoaded] = useState(false);
+  const [isGoogleDriveAuthenticated, setIsGoogleDriveAuthenticated] = useState(false);
+  const [uploadingToDriveItemId, setUploadingToDriveItemId] = useState<number | null>(null);
 
 
   useEffect(() => {
@@ -160,6 +165,141 @@ const ImageGeneratorApp = () => {
   const [refinementPromptText, setRefinementPromptText] = useState<string>('');
   const [isSubmittingRefinement, setIsSubmittingRefinement] = useState<boolean>(false);
 
+  useEffect(() => {
+    const initGoogleDriveApi = async () => {
+      try {
+        const gapi = await loadGapiInsideDOM();
+        gapi.load('client:auth2', async () => {
+          try {
+            if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
+              console.warn("Google Client ID no está configurado. La subida a Drive no funcionará.");
+              toast({ title: "Configuración Incompleta", description: "Google Client ID no configurado. Subida a Drive deshabilitada.", variant: "destructive", duration: 10000 });
+              setGoogleDriveApiLoaded(false); // Mark as not loaded or failed
+              return;
+            }
+            await gapi.client.init({
+              clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+              scope: 'https://www.googleapis.com/auth/drive.file', // Scope to create files
+              discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+            });
+            setGoogleDriveApiLoaded(true);
+            const authInstance = gapi.auth2.getAuthInstance();
+            if (authInstance.isSignedIn.get()) {
+              setIsGoogleDriveAuthenticated(true);
+            }
+            authInstance.isSignedIn.listen(setIsGoogleDriveAuthenticated);
+          } catch (error) {
+            console.error("Error initializing Google API client auth:", error);
+            toast({ title: "Error API Google", description: "No se pudo inicializar el cliente de Google Drive.", variant: "destructive" });
+            setGoogleDriveApiLoaded(false);
+          }
+        });
+      } catch (error) {
+         console.error("Error loading GAPI script:", error);
+         toast({ title: "Error Carga Google API", description: "No se pudo cargar el script de Google.", variant: "destructive" });
+         setGoogleDriveApiLoaded(false);
+      }
+    };
+    initGoogleDriveApi();
+  }, [toast]);
+
+  const handleGoogleDriveAuth = async () => {
+    if (!googleDriveApiLoaded || !window.gapi || !window.gapi.auth2) {
+      toast({ title: "Error", description: "La API de Google Drive aún no está lista.", variant: "destructive" });
+      return false;
+    }
+    try {
+      const authInstance = window.gapi.auth2.getAuthInstance();
+      if (!authInstance.isSignedIn.get()) {
+        await authInstance.signIn();
+      }
+      const signedIn = authInstance.isSignedIn.get();
+      setIsGoogleDriveAuthenticated(signedIn);
+      if (!signedIn) {
+        toast({ title: "Autenticación Fallida", description: "No se pudo iniciar sesión con Google.", variant: "destructive" });
+      }
+      return signedIn;
+    } catch (error: any) {
+      console.error("Error during Google Drive authentication", error);
+       if (error.error === "popup_closed_by_user") {
+        toast({ title: "Autenticación Cancelada", description: "Has cerrado la ventana de inicio de sesión de Google.", variant: "default" });
+      } else {
+        toast({ title: "Error de Autenticación", description: "No se pudo autenticar con Google Drive.", variant: "destructive" });
+      }
+      setIsGoogleDriveAuthenticated(false);
+      return false;
+    }
+  };
+
+  const dataURIToBlob = (dataURI: string): Blob => {
+    const byteString = atob(dataURI.split(',')[1]);
+    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: mimeString });
+  };
+
+  const handleUploadToDrive = async (item: PromptJob) => {
+    if (!item.imageUrl) {
+      toast({ title: "Error", description: "No hay imagen para subir.", variant: "destructive" });
+      return;
+    }
+    if (!isGoogleDriveAuthenticated) {
+      const authenticated = await handleGoogleDriveAuth();
+      if (!authenticated) return;
+    }
+
+    setUploadingToDriveItemId(item.id);
+    try {
+      const gapi = window.gapi;
+      if (!gapi || !gapi.client || !gapi.auth2) {
+        throw new Error("Google API client no disponible.");
+      }
+      
+      const blob = dataURIToBlob(item.imageUrl);
+      const sanitizedPrompt = item.originalPrompt.replace(/[^a-z0-9]/gi, '_').substring(0, 50);
+      const filename = `artbot_img_${item.artStyleUsed ? item.artStyleUsed.split(' ')[0].toLowerCase() + '_' : ''}${sanitizedPrompt || 'prompt'}_${item.id}.png`;
+      
+      const fileMetadata = {
+        name: filename,
+        mimeType: blob.type,
+        // parents: ['your_folder_id'] // Opcional: para subir a una carpeta específica
+      };
+
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify(fileMetadata)], { type: 'application/json' }));
+      form.append('file', blob);
+
+      const accessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
+
+      const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: form,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || `Error del servidor: ${response.status}`);
+      }
+      
+      const responseData = await response.json();
+      console.log("Upload response:", responseData);
+      toast({ title: "Éxito", description: `Imagen "${filename}" subida a Google Drive.` });
+
+    } catch (error: any) {
+      console.error("Error uploading to Google Drive", error);
+      toast({ title: "Error de Subida", description: `No se pudo subir la imagen: ${error.message}`, variant: "destructive" });
+    } finally {
+      setUploadingToDriveItemId(null);
+    }
+  };
+
   const resetAnimations = () => {
     setShowHeartAnimation(false);
     setShowTechEffect(false);
@@ -222,6 +362,17 @@ const ImageGeneratorApp = () => {
     setCurrentJobIndexInQueue(null);
     setItemBeingRefined(null);
     setRefinementPromptText('');
+
+    // Logout from Google Drive as well
+    if (googleDriveApiLoaded && window.gapi && window.gapi.auth2) {
+      const authInstance = window.gapi.auth2.getAuthInstance();
+      if (authInstance && authInstance.isSignedIn.get()) {
+        authInstance.signOut();
+        setIsGoogleDriveAuthenticated(false);
+        toast({title: "Sesión de Google Drive cerrada."})
+      }
+    }
+
 
     if (isPasswordProtectionGloballyDisabled && isAdminLoggingOut) {
         setIsAuthenticated(true); 
@@ -450,7 +601,7 @@ const ImageGeneratorApp = () => {
   };
 
   const handleStartRefinement = (item: PromptJob) => {
-    if (isBatchProcessing || isDownloadingIndividual || isSubmittingRefinement) return;
+    if (isBatchProcessing || isDownloadingIndividual || isSubmittingRefinement || uploadingToDriveItemId) return;
     setItemBeingRefined(item);
     setRefinementPromptText('');
   };
@@ -483,13 +634,11 @@ const ImageGeneratorApp = () => {
       updateItemState(itemIdToRefine, { 
         imageUrl: refinedImageUri, 
         status: 'completed', 
-        // Optionally update originalPrompt to reflect refinement, or add a new field
-        // originalPrompt: `${itemBeingRefined.originalPrompt} (Mejorado: ${refinementPromptText})` 
       });
       toast({ title: "Éxito", description: "Imagen mejorada con éxito." });
     } catch (err: any) {
       const errMessage = err.message || 'Error desconocido durante la mejora.';
-      updateItemState(itemIdToRefine, { status: 'completed', error: `Mejora fallida: ${errMessage}` }); // Revert to completed with old image, show error
+      updateItemState(itemIdToRefine, { status: 'completed', error: `Mejora fallida: ${errMessage}` }); 
       toast({ title: "Error de Mejora", description: errMessage, variant: "destructive" });
     } finally {
       setItemBeingRefined(null);
@@ -522,13 +671,14 @@ const ImageGeneratorApp = () => {
   };
   
   const pendingAiJobsCount = processingJobs.filter(j => j.status === 'pending').length;
-  const canStartBatch = !isBatchProcessing && pendingAiJobsCount > 0 && !isDownloadingIndividual && !itemBeingRefined;
+  const canStartBatch = !isBatchProcessing && pendingAiJobsCount > 0 && !isDownloadingIndividual && !itemBeingRefined && !uploadingToDriveItemId;
   const aiJobsInQueueCount = processingJobs.filter(j => j.type === 'prompt').length;
 
   const canAddItem = !isBatchProcessing && 
                      !isInputEmpty() && 
                      !isDownloadingIndividual && 
                      !itemBeingRefined &&
+                     !uploadingToDriveItemId &&
                      displayList.length < MAX_PROMPTS_OVERALL &&
                      (inputMode !== 'prompt_only' && inputMode !== 'title_prompt' || aiJobsInQueueCount < MAX_PROCESSING_JOBS || (inputMode === 'title_prompt' && !promptForTitleInput.trim() && titleInput.trim()));
 
@@ -692,7 +842,7 @@ const ImageGeneratorApp = () => {
                     value={inputMode}
                     onValueChange={(value: string) => setInputMode(value as InputMode)}
                     className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0 mb-4"
-                    disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined}
+                    disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined || !!uploadingToDriveItemId}
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="url" id="mode_url" />
@@ -721,7 +871,7 @@ const ImageGeneratorApp = () => {
                       placeholder="https://ejemplo.com/imagen.png"
                       value={urlInput}
                       onChange={(e) => setUrlInput(e.target.value)}
-                      disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined}
+                      disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined || !!uploadingToDriveItemId}
                     />
                   </div>
                 )}
@@ -739,7 +889,7 @@ const ImageGeneratorApp = () => {
                         placeholder="Mi increíble título"
                         value={titleInput}
                         onChange={(e) => setTitleInput(e.target.value)}
-                        disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined}
+                        disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined || !!uploadingToDriveItemId}
                       />
                     </div>
                     <div className="mb-6">
@@ -753,7 +903,7 @@ const ImageGeneratorApp = () => {
                         placeholder="Descripción detallada para la IA..."
                         value={promptForTitleInput}
                         onChange={(e) => setPromptForTitleInput(e.target.value)}
-                        disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined || (aiJobsInQueueCount >= MAX_PROCESSING_JOBS && promptForTitleInput.length > 0)}
+                        disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined || !!uploadingToDriveItemId || (aiJobsInQueueCount >= MAX_PROCESSING_JOBS && promptForTitleInput.length > 0)}
                       />
                        {aiJobsInQueueCount >= MAX_PROCESSING_JOBS && <p className="text-xs text-yellow-600 mt-1">Límite de prompts de IA ({MAX_PROCESSING_JOBS}) alcanzado para este lote.</p>}
                     </div>
@@ -772,7 +922,7 @@ const ImageGeneratorApp = () => {
                       placeholder="Un gato cibernético en una ciudad lluviosa de neón..."
                       value={singlePromptInput}
                       onChange={(e) => setSinglePromptInput(e.target.value)}
-                      disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined || (aiJobsInQueueCount >= MAX_PROCESSING_JOBS && singlePromptInput.length > 0)}
+                      disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined || !!uploadingToDriveItemId || (aiJobsInQueueCount >= MAX_PROCESSING_JOBS && singlePromptInput.length > 0)}
                     />
                     {aiJobsInQueueCount >= MAX_PROCESSING_JOBS && <p className="text-xs text-yellow-600 mt-1">Límite de prompts de IA ({MAX_PROCESSING_JOBS}) alcanzado para este lote.</p>}
                   </div>
@@ -785,7 +935,7 @@ const ImageGeneratorApp = () => {
                   <Select 
                     value={selectedStyleValue} 
                     onValueChange={setSelectedStyleValue}
-                    disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined}
+                    disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined || !!uploadingToDriveItemId}
                   >
                     <SelectTrigger 
                       id="artStyle"
@@ -821,7 +971,7 @@ const ImageGeneratorApp = () => {
                   </Button>
                   <Button
                     onClick={handleDownloadAllImages}
-                    disabled={!canDownloadGenerated || isDownloadingIndividual || isBatchProcessing || !!itemBeingRefined}
+                    disabled={!canDownloadGenerated || isDownloadingIndividual || isBatchProcessing || !!itemBeingRefined || !!uploadingToDriveItemId}
                     className="w-full text-white font-semibold py-3 px-4 text-lg focus:ring-4 focus:ring-primary/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:bg-pink-600/90 bg-pink-500" 
                   >
                     {isDownloadingIndividual ? <><Loader2 className="w-6 h-6 mr-2 animate-spin" /> Descargando IA...</> : <><Download className="w-6 h-6 mr-2" /> Descargar Imágenes IA</>}
@@ -900,11 +1050,33 @@ const ImageGeneratorApp = () => {
                                 <div className="mt-3 p-1 border-2 border-dashed border-primary/60 rounded-md bg-background/40">
                                   <img src={item.imageUrl} alt={`Generado por IA para: ${item.originalPrompt} (${item.artStyleUsed})`} className="w-full h-auto rounded object-contain max-h-[40vh]" data-ai-hint="generated art" />
                                 </div>
-                                {!itemBeingRefined && !isBatchProcessing && !isDownloadingIndividual && (
-                                  <Button onClick={() => handleStartRefinement(item)} size="sm" variant="outline" className="mt-3 border-accent text-accent hover:bg-accent/10">
-                                    <Wand2 className="mr-2 h-4 w-4" /> Mejorar Imagen
-                                  </Button>
-                                )}
+                                <div className="flex flex-wrap gap-2">
+                                  {!itemBeingRefined && !isBatchProcessing && !isDownloadingIndividual && !uploadingToDriveItemId &&(
+                                    <Button onClick={() => handleStartRefinement(item)} size="sm" variant="outline" className="mt-3 border-accent text-accent hover:bg-accent/10">
+                                      <Wand2 className="mr-2 h-4 w-4" /> Mejorar Imagen
+                                    </Button>
+                                  )}
+                                  {!isBatchProcessing && !isDownloadingIndividual && !itemBeingRefined && (
+                                      <Button
+                                        onClick={() => handleUploadToDrive(item)}
+                                        disabled={uploadingToDriveItemId === item.id || !googleDriveApiLoaded || !process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
+                                        size="sm"
+                                        variant="outline"
+                                        className="mt-3 border-blue-500 text-blue-500 hover:text-blue-700 hover:bg-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+                                        title={!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? "Google Client ID no configurado" : (isGoogleDriveAuthenticated ? "Subir a Google Drive" : "Autenticar con Google Drive para subir")}
+                                      >
+                                        {uploadingToDriveItemId === item.id ? (
+                                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        ) : (
+                                          <UploadCloud className="mr-2 h-4 w-4" />
+                                        )}
+                                        {isGoogleDriveAuthenticated ? 'Subir a Drive' : 'Autenticar y Subir'}
+                                      </Button>
+                                  )}
+                                </div>
+                                 {!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && googleDriveApiLoaded === false && (
+                                    <p className="text-xs text-yellow-600 mt-1">La subida a Google Drive está deshabilitada porque Google Client ID no está configurado en las variables de entorno.</p>
+                                 )}
                               </>
                             )}
                             {itemBeingRefined?.id === item.id && (
@@ -1024,5 +1196,3 @@ const ImageGeneratorApp = () => {
 };
 
 export default ImageGeneratorApp;
-
-    
