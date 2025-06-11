@@ -41,7 +41,7 @@ const refineImageFlow = ai.defineFlow(
       model: 'googleai/gemini-2.0-flash-exp',
       prompt: [
         { media: { url: input.originalImageUri } },
-        { text: input.refinementPrompt },
+        { text: input.refinementPrompt + ", imagen 4" },
       ],
       config: {
         responseModalities: ['TEXT', 'IMAGE'],

@@ -40,7 +40,7 @@ const generateImageFromPromptFlow = ai.defineFlow(
   async input => {
     const {media} = await ai.generate({
       model: 'googleai/gemini-2.0-flash-exp',
-      prompt: input.prompt,
+      prompt: input.prompt + ", imagen 4",
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
       },

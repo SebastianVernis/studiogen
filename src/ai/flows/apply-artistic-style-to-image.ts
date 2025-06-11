@@ -51,7 +51,7 @@ const applyArtisticStyleToImageFlow = ai.defineFlow(
       // IMPORTANT: ONLY the googleai/gemini-2.0-flash-exp model is able to generate images. You MUST use exactly this model to generate images.
       model: 'googleai/gemini-2.0-flash-exp',
 
-      prompt: input.prompt + ', ' + input.artStyle,
+      prompt: input.prompt + ', ' + input.artStyle + ", imagen 4",
 
       config: {
         responseModalities: ['TEXT', 'IMAGE'], // MUST provide both TEXT and IMAGE, IMAGE only won't work
