@@ -7,6 +7,7 @@ import FuturisticBackground from '@/components/futuristic-background';
 import { artStyles, MAX_PROMPTS_OVERALL, MAX_PROCESSING_JOBS, DOWNLOAD_DELAY_MS, type DisplayItem, type PromptJob, type ArtStyle } from '@/lib/artbot-config';
 import { generateImageFromPrompt } from '@/ai/flows/generate-image-from-prompt';
 import { refineImage } from '@/ai/flows/refine-image-flow';
+import { extractPromptsFromText } from '@/ai/flows/extract-prompts-from-text-flow';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -23,7 +24,6 @@ import MusicVibes from '@/components/ui/music-vibes';
 import AccessDeniedEffect from '@/components/ui/access-denied-effect';
 import MoneyRain from '@/components/ui/money-rain';
 import { useToast } from "@/hooks/use-toast";
-// Removed static import: import { loadGapiInsideDOM } from 'gapi-script';
 
 
 const isValidImageUrl = (url: string): boolean => {
@@ -66,6 +66,12 @@ const ImageGeneratorApp = () => {
   const [googleDriveApiLoaded, setGoogleDriveApiLoaded] = useState(false);
   const [isGoogleDriveAuthenticated, setIsGoogleDriveAuthenticated] = useState(false);
   const [uploadingToDriveItemId, setUploadingToDriveItemId] = useState<number | null>(null);
+
+  const [showAdminPromptAnalyzer, setShowAdminPromptAnalyzer] = useState(false);
+  const [adminPromptAnalysisText, setAdminPromptAnalysisText] = useState('');
+  const [isAnalyzingText, setIsAnalyzingText] = useState(false);
+  const [extractedAdminPrompts, setExtractedAdminPrompts] = useState<string[]>([]);
+  const [isAddingAdminPromptsToQueue, setIsAddingAdminPromptsToQueue] = useState(false);
 
 
   useEffect(() => {
@@ -168,19 +174,19 @@ const ImageGeneratorApp = () => {
   useEffect(() => {
     const initGoogleDriveApi = async () => {
       try {
-        const { loadGapiInsideDOM } = await import('gapi-script'); // Dynamic import
+        const { loadGapiInsideDOM } = await import('gapi-script'); 
         const gapi = await loadGapiInsideDOM();
         gapi.load('client:auth2', async () => {
           try {
             if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
               console.warn("Google Client ID no está configurado. La subida a Drive no funcionará.");
               toast({ title: "Configuración Incompleta", description: "Google Client ID no configurado. Subida a Drive deshabilitada.", variant: "destructive", duration: 10000 });
-              setGoogleDriveApiLoaded(false); // Mark as not loaded or failed
+              setGoogleDriveApiLoaded(false);
               return;
             }
             await gapi.client.init({
               clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-              scope: 'https://www.googleapis.com/auth/drive.file', // Scope to create files
+              scope: 'https://www.googleapis.com/auth/drive.file', 
               discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
             });
             setGoogleDriveApiLoaded(true);
@@ -267,7 +273,6 @@ const ImageGeneratorApp = () => {
       const fileMetadata = {
         name: filename,
         mimeType: blob.type,
-        // parents: ['your_folder_id'] // Opcional: para subir a una carpeta específica
       };
 
       const form = new FormData();
@@ -364,7 +369,13 @@ const ImageGeneratorApp = () => {
     setItemBeingRefined(null);
     setRefinementPromptText('');
 
-    // Logout from Google Drive as well
+    setShowAdminPromptAnalyzer(false);
+    setAdminPromptAnalysisText('');
+    setExtractedAdminPrompts([]);
+    setIsAnalyzingText(false);
+    setIsAddingAdminPromptsToQueue(false);
+
+
     if (googleDriveApiLoaded && window.gapi && window.gapi.auth2) {
       const authInstance = window.gapi.auth2.getAuthInstance();
       if (authInstance && authInstance.isSignedIn.get()) {
@@ -555,7 +566,7 @@ const ImageGeneratorApp = () => {
     }
     setIsBatchProcessing(true);
     setCurrentJobIndexInQueue(0); 
-    setItemBeingRefined(null); // Cancel any active refinement UI
+    setItemBeingRefined(null); 
   };
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -646,6 +657,87 @@ const ImageGeneratorApp = () => {
       setRefinementPromptText('');
       setIsSubmittingRefinement(false);
     }
+  };
+
+  const handleAnalyzeTextForPrompts = async () => {
+    if (!adminPromptAnalysisText.trim()) {
+      toast({ title: "Texto Vacío", description: "Por favor, ingresa texto para analizar.", variant: "destructive" });
+      return;
+    }
+    setIsAnalyzingText(true);
+    setExtractedAdminPrompts([]);
+    try {
+      const result = await extractPromptsFromText({ textBlock: adminPromptAnalysisText });
+      if (result.prompts && result.prompts.length > 0) {
+        setExtractedAdminPrompts(result.prompts);
+        toast({ title: "Análisis Completo", description: `${result.prompts.length} prompts detectados.` });
+      } else {
+        toast({ title: "Sin Prompts", description: "No se detectaron prompts claros en el texto.", variant: "default" });
+      }
+    } catch (error: any) {
+      console.error("Error analyzing text for prompts:", error);
+      toast({ title: "Error de Análisis", description: error.message || "No se pudo analizar el texto.", variant: "destructive" });
+    } finally {
+      setIsAnalyzingText(false);
+    }
+  };
+
+  const handleAddAdminPromptsToQueue = () => {
+    if (extractedAdminPrompts.length === 0) return;
+
+    setIsAddingAdminPromptsToQueue(true);
+    let promptsAdded = 0;
+    const currentArtStyle = artStyles.find(style => style.value === selectedStyleValue) || artStyles[0];
+
+    const newDisplayItemsBatch: DisplayItem[] = [];
+    const newProcessingJobsBatch: PromptJob[] = [];
+
+    for (const promptText of extractedAdminPrompts) {
+      if (displayList.length + newDisplayItemsBatch.length >= MAX_PROMPTS_OVERALL) {
+        toast({ title: "Límite General Alcanzado", description: `No se pueden agregar más de ${MAX_PROMPTS_OVERALL} elementos. ${promptsAdded} prompts fueron agregados.`, variant: "destructive", duration: 7000 });
+        break;
+      }
+      const currentAiJobsInQueue = processingJobs.filter(j => j.type === 'prompt').length + newProcessingJobsBatch.length;
+      if (currentAiJobsInQueue >= MAX_PROCESSING_JOBS) {
+        toast({ title: "Límite de Prompts IA Alcanzado", description: `No se pueden agregar más de ${MAX_PROCESSING_JOBS} prompts de IA. ${promptsAdded} prompts fueron agregados.`, variant: "destructive", duration: 7000 });
+        break;
+      }
+
+      const uniqueId = Date.now() + displayList.length + newDisplayItemsBatch.length + Math.random();
+      const styledPrompt = `${promptText.trim()}${currentArtStyle.promptSuffix}`;
+      const newJob: PromptJob = {
+        id: uniqueId,
+        type: 'prompt',
+        originalPrompt: promptText.trim(),
+        styledPrompt,
+        status: 'pending',
+        imageUrl: null,
+        error: null,
+        artStyleUsed: currentArtStyle.name,
+      };
+      newDisplayItemsBatch.push(newJob);
+      newProcessingJobsBatch.push(newJob);
+      promptsAdded++;
+    }
+
+    if (newDisplayItemsBatch.length > 0) {
+      setDisplayList(prev => [...prev, ...newDisplayItemsBatch]);
+    }
+    if (newProcessingJobsBatch.length > 0) {
+      setProcessingJobs(prev => [...prev, ...newProcessingJobsBatch]);
+    }
+    
+    toast({ title: "Prompts Agregados", description: `${promptsAdded} prompts han sido añadidos a la cola principal.` });
+
+    setExtractedAdminPrompts([]);
+    // setAdminPromptAnalysisText(''); // Decidido mantener el texto por si el usuario quiere refinar el análisis.
+    setIsAddingAdminPromptsToQueue(false);
+    
+    // Opcional: si no se está procesando, iniciar
+    // const totalPending = processingJobs.filter(j => j.status === 'pending').length + newProcessingJobsBatch.filter(j => j.status === 'pending').length;
+    // if (!isBatchProcessing && totalPending > 0 && (currentJobIndexInQueue === null || currentJobIndexInQueue >= (processingJobs.length - newProcessingJobsBatch.length))) {
+    //    handleStartBatchProcessing();
+    // }
   };
 
 
@@ -1127,7 +1219,7 @@ const ImageGeneratorApp = () => {
                     <ShieldCheck className="mr-3 h-7 w-7"/> Panel de Administrador
                 </CardTitle>
                 <CardDescription>
-                  Gestionar la disponibilidad de las contraseñas y el acceso global.
+                  Gestionar la disponibilidad de las contraseñas, el acceso global y herramientas de generación.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -1179,6 +1271,81 @@ const ImageGeneratorApp = () => {
                       />
                     </div>
                 ))}
+
+                <div className="mt-4 pt-4 border-t border-border">
+                  <h4 className="text-lg font-semibold text-accent mb-2 flex items-center">
+                    <ListChecks className="mr-2 h-5 w-5" /> Análisis de Texto para Prompts
+                  </h4>
+                  {!showAdminPromptAnalyzer && (
+                    <Button onClick={() => setShowAdminPromptAnalyzer(true)} className="w-full">
+                      Iniciar Análisis de Texto
+                    </Button>
+                  )}
+                  {showAdminPromptAnalyzer && (
+                    <div className="space-y-4">
+                      <Textarea
+                        placeholder="Pega aquí el texto que contiene los prompts..."
+                        rows={8}
+                        value={adminPromptAnalysisText}
+                        onChange={(e) => setAdminPromptAnalysisText(e.target.value)}
+                        disabled={isAnalyzingText || extractedAdminPrompts.length > 0 || isAddingAdminPromptsToQueue}
+                        className="bg-background/70 border-primary focus-visible:ring-accent focus-visible:border-accent"
+                      />
+                      {extractedAdminPrompts.length === 0 && (
+                        <Button
+                          onClick={handleAnalyzeTextForPrompts}
+                          disabled={!adminPromptAnalysisText.trim() || isAnalyzingText || isAddingAdminPromptsToQueue}
+                          className="w-full"
+                        >
+                          {isAnalyzingText ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                          Extraer Prompts del Texto
+                        </Button>
+                      )}
+
+                      {extractedAdminPrompts.length > 0 && (
+                        <div className="p-3 bg-primary/10 rounded-lg border border-primary/30">
+                          <h5 className="text-md font-medium text-primary mb-2">Prompts Detectados:</h5>
+                          <ul className="list-disc list-inside space-y-1 text-sm text-foreground">
+                            {extractedAdminPrompts.map((p, idx) => (
+                              <li key={idx}>{p}</li>
+                            ))}
+                          </ul>
+                          <div className="flex gap-2 mt-4">
+                            <Button
+                              onClick={handleAddAdminPromptsToQueue}
+                              disabled={isAddingAdminPromptsToQueue}
+                              className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                            >
+                              {isAddingAdminPromptsToQueue ? <Loader2 className="animate-spin mr-2" /> : <PlayCircle className="mr-2 h-4 w-4" />}
+                              Generar Imágenes ({extractedAdminPrompts.length})
+                            </Button>
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setExtractedAdminPrompts([]);
+                                // No limpiar adminPromptAnalysisText aquí para permitir refinar el análisis si es necesario
+                              }}
+                              disabled={isAddingAdminPromptsToQueue}
+                            >
+                              Analizar de Nuevo
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                       <Button variant="outline" onClick={() => {
+                        setShowAdminPromptAnalyzer(false);
+                        setAdminPromptAnalysisText('');
+                        setExtractedAdminPrompts([]);
+                        setIsAnalyzingText(false);
+                        setIsAddingAdminPromptsToQueue(false);
+                      }} className="w-full">
+                        Cerrar Analizador
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+
                 <Button 
                   variant="outline" 
                   onClick={() => setIsAdminPanelVisible(false)} 
@@ -1197,4 +1364,3 @@ const ImageGeneratorApp = () => {
 };
 
 export default ImageGeneratorApp;
-
