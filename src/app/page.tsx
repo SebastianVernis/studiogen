@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart, Cpu, CircuitBoard, Music2, Disc3, ActivitySquare, Ban, AlertOctagon, Code2, DollarSign, Landmark, CreditCard, Shield, ShieldCheck, LogOut } from 'lucide-react';
+import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart, Cpu, CircuitBoard, Music2, Disc3, ActivitySquare, Ban, AlertOctagon, Code2, DollarSign, Landmark, CreditCard, Shield, ShieldCheck, LogOut, Menu as MenuIcon, Moon, Sun } from 'lucide-react';
 import FuturisticBackground from '@/components/futuristic-background';
 import { artStyles, MAX_PROMPTS_OVERALL, MAX_PROCESSING_JOBS, DOWNLOAD_DELAY_MS, type DisplayItem, type PromptJob, type ArtStyle } from '@/lib/artbot-config';
 import { generateImageFromPrompt } from '@/ai/flows/generate-image-from-prompt';
@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import HeartRain from '@/components/ui/heart-rain';
 import TechEffect from '@/components/ui/tech-effect';
@@ -41,6 +42,7 @@ const ImageGeneratorApp = () => {
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState('');
   const [greetingMessage, setGreetingMessage] = useState('');
+  const [currentUserIsAdmin, setCurrentUserIsAdmin] = useState(false);
 
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
   const [heartAnimationKey, setHeartAnimationKey] = useState(0);
@@ -53,6 +55,35 @@ const ImageGeneratorApp = () => {
   const [showMoneyAnimation, setShowMoneyAnimation] = useState(false);
   const [moneyAnimationKey, setMoneyAnimationKey] = useState(0);
 
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+      document.documentElement.classList.add('dark');
+      setIsDarkMode(true);
+    } else {
+      document.documentElement.classList.remove('dark');
+      setIsDarkMode(false);
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(prevMode => {
+      const newMode = !prevMode;
+      if (newMode) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+      return newMode;
+    });
+  };
+
+
   const initialPasswordConfigs: Record<string, PasswordConfig> = {
     "Chispart123": {
       greeting: "Hola, Amo.",
@@ -63,21 +94,25 @@ const ImageGeneratorApp = () => {
     "Patrona1": {
       greeting: "Hola, amor de mi vida",
       animation: () => { setShowHeartAnimation(true); setHeartAnimationKey(Date.now()); },
+      isAdmin: false,
       isEnabledGlobal: true,
     },
     "ChispukAdmin": {
       greeting: "El que no baila no opina",
       animation: () => { setShowMusicVibes(true); setMusicVibesKey(Date.now()); },
+      isAdmin: false,
       isEnabledGlobal: true,
     },
     "supersecretpassword": {
       greeting: "¿Tú qué haces aquí? ¡LARGO!",
       animation: () => { setShowAccessDeniedEffect(true); setAccessDeniedEffectKey(Date.now()); },
+      isAdmin: false,
       isEnabledGlobal: true,
     },
     "Miau1234*": {
       greeting: "¡A hacer billetes, Miau!",
       animation: () => { setShowMoneyAnimation(true); setMoneyAnimationKey(Date.now()); },
+      isAdmin: false,
       isEnabledGlobal: true,
     }
   };
@@ -115,20 +150,23 @@ const ImageGeneratorApp = () => {
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     resetAnimations();
-    const config = allPasswordConfigs[passwordInput];
+    const submittedPassword = passwordInput; // Store before clearing
+    const config = allPasswordConfigs[submittedPassword];
 
     if (showDirectAdminLogin) {
-      if (passwordInput === "Chispart123") {
+      if (submittedPassword === "Chispart123") {
         setIsAuthenticated(true);
         setGreetingMessage(allPasswordConfigs["Chispart123"].greeting);
         allPasswordConfigs["Chispart123"].animation();
         setIsAdminPanelVisible(true);
+        setCurrentUserIsAdmin(true);
         setAuthError('');
         setPasswordInput('');
         setShowDirectAdminLogin(false); 
       } else {
         setAuthError('Contraseña de administrador incorrecta.');
         setGreetingMessage('');
+        setCurrentUserIsAdmin(false);
       }
       return;
     }
@@ -139,13 +177,33 @@ const ImageGeneratorApp = () => {
       config.animation();
       if (config.isAdmin) {
         setIsAdminPanelVisible(true);
+        setCurrentUserIsAdmin(true);
+      } else {
+        setCurrentUserIsAdmin(false);
       }
       setAuthError('');
-      setPasswordInput('');
+      setPasswordInput(''); // Clear password after successful login
     } else {
       setAuthError('Contraseña incorrecta o deshabilitada.');
       setGreetingMessage('');
+      setCurrentUserIsAdmin(false);
     }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setGreetingMessage('');
+    setPasswordInput('');
+    setAuthError('');
+    setIsAdminPanelVisible(false);
+    setCurrentUserIsAdmin(false);
+    setShowDirectAdminLogin(false);
+    resetAnimations();
+    // Reset app specific states if needed
+    setDisplayList([]);
+    setProcessingJobs([]);
+    setIsBatchProcessing(false);
+    setCurrentJobIndexInQueue(null);
   };
   
   const togglePasswordGlobalEnable = (passwordKey: string, checked: boolean) => {
@@ -158,7 +216,6 @@ const ImageGeneratorApp = () => {
   const handleAdminLogoutFromPanel = () => {
     setIsAdminPanelVisible(false);
     // Note: This only hides the panel, doesn't log out the admin from the app.
-    // If all other passwords are disabled, the main login will still show admin direct login if the page is reloaded or session ends.
   };
 
 
@@ -361,7 +418,6 @@ const ImageGeneratorApp = () => {
   };
   
   const canDownloadGenerated = !isBatchProcessing && displayList.some(item => item.type === 'prompt' && item.status === 'completed' && item.imageUrl && item.imageUrl.startsWith('data:image'));
-  const currentSelectedArtStyleObj = artStyles.find(s => s.value === selectedStyleValue);
 
   const isInputEmpty = () => {
     switch (inputMode) {
@@ -455,7 +511,36 @@ const ImageGeneratorApp = () => {
          </Card>
       ) : (
         // Main App Content when Authenticated
-        <div className="w-full max-w-3xl">
+        <>
+        <div className="absolute top-4 left-4 z-50">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="bg-card/80 hover:bg-card backdrop-blur-sm">
+                  <MenuIcon className="h-5 w-5 text-primary" />
+                  <span className="sr-only">Abrir menú</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem onClick={toggleDarkMode} className="cursor-pointer">
+                  {isDarkMode ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
+                  <span>Cambiar a tema {isDarkMode ? 'claro' : 'oscuro'}</span>
+                </DropdownMenuItem>
+                {currentUserIsAdmin && (
+                  <DropdownMenuItem onClick={() => setIsAdminPanelVisible(true)} className="cursor-pointer">
+                    <ShieldCheck className="mr-2 h-4 w-4" />
+                    <span>Panel de Administrador</span>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive-foreground focus:bg-destructive">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Cerrar Sesión</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+        <div className="w-full max-w-3xl mt-16 sm:mt-0"> {/* Added margin-top for mobile to avoid overlap with menu */}
             <Card className="relative z-10 w-full bg-card/90 backdrop-blur-sm shadow-2xl shadow-primary/30 rounded-xl">
             <CardHeader className="text-center">
               {greetingMessage && (
@@ -708,7 +793,7 @@ const ImageGeneratorApp = () => {
             </CardContent>
           </Card>
 
-          {isAdminPanelVisible && (
+          {isAdminPanelVisible && currentUserIsAdmin && (
             <Card className="mt-6 relative z-10 w-full bg-card/90 backdrop-blur-sm shadow-xl shadow-primary/40 rounded-xl">
               <CardHeader>
                 <CardTitle className="flex items-center text-2xl text-primary">
@@ -751,6 +836,7 @@ const ImageGeneratorApp = () => {
             </Card>
           )}
         </div>
+        </>
       )}
     </div>
   );
