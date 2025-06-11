@@ -23,7 +23,7 @@ import MusicVibes from '@/components/ui/music-vibes';
 import AccessDeniedEffect from '@/components/ui/access-denied-effect';
 import MoneyRain from '@/components/ui/money-rain';
 import { useToast } from "@/hooks/use-toast";
-import { loadGapiInsideDOM } from 'gapi-script';
+// Removed static import: import { loadGapiInsideDOM } from 'gapi-script';
 
 
 const isValidImageUrl = (url: string): boolean => {
@@ -168,6 +168,7 @@ const ImageGeneratorApp = () => {
   useEffect(() => {
     const initGoogleDriveApi = async () => {
       try {
+        const { loadGapiInsideDOM } = await import('gapi-script'); // Dynamic import
         const gapi = await loadGapiInsideDOM();
         gapi.load('client:auth2', async () => {
           try {
@@ -1196,3 +1197,4 @@ const ImageGeneratorApp = () => {
 };
 
 export default ImageGeneratorApp;
+
