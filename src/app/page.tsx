@@ -1082,6 +1082,67 @@ const ImageGeneratorApp = () => {
                       </div>
                 )}
                 
+                {/* Text Analyzer Section - For all users */}
+                <div className="mt-6 pt-6 border-t border-border">
+                  <h3 className="text-xl font-headline text-accent mb-3 flex items-center">
+                    <ListChecks className="mr-2 h-6 w-6" /> Analizador de Texto para Prompts
+                  </h3>
+                  {!showAdminPromptAnalyzer && (
+                    <Button onClick={() => setShowAdminPromptAnalyzer(true)} className="w-full bg-secondary hover:bg-secondary/80 text-secondary-foreground">
+                      <Sparkles className="mr-2 h-4 w-4" /> Iniciar Análisis de Texto
+                    </Button>
+                  )}
+                  {showAdminPromptAnalyzer && (
+                    <div className="space-y-4 p-4 border border-primary/30 rounded-lg bg-card/50 mt-2">
+                      <Textarea
+                        placeholder="Pega aquí el texto que contiene los prompts..."
+                        rows={8}
+                        value={adminPromptAnalysisText}
+                        onChange={(e) => setAdminPromptAnalysisText(e.target.value)}
+                        disabled={isAnalyzingText || extractedAdminPrompts.length > 0 || isAddingAdminPromptsToQueue}
+                        className="bg-background/70 border-primary focus-visible:ring-accent focus-visible:border-accent"
+                      />
+                      {extractedAdminPrompts.length === 0 && (
+                        <Button
+                          onClick={handleAnalyzeTextForPrompts}
+                          disabled={!adminPromptAnalysisText.trim() || isAnalyzingText || isAddingAdminPromptsToQueue}
+                          className="w-full"
+                        >
+                          {isAnalyzingText ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                          Extraer Prompts del Texto
+                        </Button>
+                      )}
+
+                      {extractedAdminPrompts.length > 0 && (
+                        <div className="p-3 bg-primary/10 rounded-lg border border-primary/30">
+                          <h5 className="text-md font-medium text-primary mb-2">Prompts Detectados:</h5>
+                          <ul className="list-disc list-inside space-y-1 text-sm text-foreground">
+                            {extractedAdminPrompts.map((p, idx) => (
+                              <li key={idx}>{p}</li>
+                            ))}
+                          </ul>
+                          <div className="flex gap-2 mt-4">
+                            <Button
+                              onClick={handleAddAdminPromptsToQueue}
+                              disabled={isAddingAdminPromptsToQueue}
+                              className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                            >
+                              {isAddingAdminPromptsToQueue ? <Loader2 className="animate-spin mr-2" /> : <PlayCircle className="mr-2 h-4 w-4" />}
+                              Generar Imágenes ({extractedAdminPrompts.length})
+                            </Button>
+                            <Button variant="outline" onClick={() => { setExtractedAdminPrompts([]); }} disabled={isAddingAdminPromptsToQueue}>
+                              Analizar de Nuevo
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                       <Button variant="outline" onClick={() => { setShowAdminPromptAnalyzer(false); setAdminPromptAnalysisText(''); setExtractedAdminPrompts([]); setIsAnalyzingText(false); setIsAddingAdminPromptsToQueue(false); }} className="w-full mt-2">
+                        Cerrar Analizador
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
                 {displayList.length > 0 && (
                   <div className="mt-8 space-y-4">
                     <h3 className="text-xl font-headline text-accent border-b-2 border-primary pb-2 mb-4">Cola de Procesamiento:</h3>
@@ -1219,7 +1280,7 @@ const ImageGeneratorApp = () => {
                     <ShieldCheck className="mr-3 h-7 w-7"/> Panel de Administrador
                 </CardTitle>
                 <CardDescription>
-                  Gestionar la disponibilidad de las contraseñas, el acceso global y herramientas de generación.
+                  Gestionar la disponibilidad de las contraseñas y el acceso global.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -1271,80 +1332,6 @@ const ImageGeneratorApp = () => {
                       />
                     </div>
                 ))}
-
-                <div className="mt-4 pt-4 border-t border-border">
-                  <h4 className="text-lg font-semibold text-accent mb-2 flex items-center">
-                    <ListChecks className="mr-2 h-5 w-5" /> Análisis de Texto para Prompts
-                  </h4>
-                  {!showAdminPromptAnalyzer && (
-                    <Button onClick={() => setShowAdminPromptAnalyzer(true)} className="w-full">
-                      Iniciar Análisis de Texto
-                    </Button>
-                  )}
-                  {showAdminPromptAnalyzer && (
-                    <div className="space-y-4">
-                      <Textarea
-                        placeholder="Pega aquí el texto que contiene los prompts..."
-                        rows={8}
-                        value={adminPromptAnalysisText}
-                        onChange={(e) => setAdminPromptAnalysisText(e.target.value)}
-                        disabled={isAnalyzingText || extractedAdminPrompts.length > 0 || isAddingAdminPromptsToQueue}
-                        className="bg-background/70 border-primary focus-visible:ring-accent focus-visible:border-accent"
-                      />
-                      {extractedAdminPrompts.length === 0 && (
-                        <Button
-                          onClick={handleAnalyzeTextForPrompts}
-                          disabled={!adminPromptAnalysisText.trim() || isAnalyzingText || isAddingAdminPromptsToQueue}
-                          className="w-full"
-                        >
-                          {isAnalyzingText ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                          Extraer Prompts del Texto
-                        </Button>
-                      )}
-
-                      {extractedAdminPrompts.length > 0 && (
-                        <div className="p-3 bg-primary/10 rounded-lg border border-primary/30">
-                          <h5 className="text-md font-medium text-primary mb-2">Prompts Detectados:</h5>
-                          <ul className="list-disc list-inside space-y-1 text-sm text-foreground">
-                            {extractedAdminPrompts.map((p, idx) => (
-                              <li key={idx}>{p}</li>
-                            ))}
-                          </ul>
-                          <div className="flex gap-2 mt-4">
-                            <Button
-                              onClick={handleAddAdminPromptsToQueue}
-                              disabled={isAddingAdminPromptsToQueue}
-                              className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-                            >
-                              {isAddingAdminPromptsToQueue ? <Loader2 className="animate-spin mr-2" /> : <PlayCircle className="mr-2 h-4 w-4" />}
-                              Generar Imágenes ({extractedAdminPrompts.length})
-                            </Button>
-                            <Button
-                              variant="outline"
-                              onClick={() => {
-                                setExtractedAdminPrompts([]);
-                                // No limpiar adminPromptAnalysisText aquí para permitir refinar el análisis si es necesario
-                              }}
-                              disabled={isAddingAdminPromptsToQueue}
-                            >
-                              Analizar de Nuevo
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                       <Button variant="outline" onClick={() => {
-                        setShowAdminPromptAnalyzer(false);
-                        setAdminPromptAnalysisText('');
-                        setExtractedAdminPrompts([]);
-                        setIsAnalyzingText(false);
-                        setIsAddingAdminPromptsToQueue(false);
-                      }} className="w-full">
-                        Cerrar Analizador
-                      </Button>
-                    </div>
-                  )}
-                </div>
-
 
                 <Button 
                   variant="outline" 
