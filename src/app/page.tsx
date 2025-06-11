@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart, Cpu, CircuitBoard, Music2, Disc3, ActivitySquare, Ban, AlertOctagon, Code2, DollarSign, Landmark, CreditCard, Shield, ShieldCheck, LogOut, Menu as MenuIcon, Moon, Sun } from 'lucide-react';
+import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart, Cpu, CircuitBoard, Music2, Disc3, ActivitySquare, Ban, AlertOctagon, Code2, DollarSign, Landmark, CreditCard, Shield, ShieldCheck, LogOut, Menu as MenuIcon, Moon, Sun, GlobeLock, CheckCircle } from 'lucide-react';
 import FuturisticBackground from '@/components/futuristic-background';
 import { artStyles, MAX_PROMPTS_OVERALL, MAX_PROCESSING_JOBS, DOWNLOAD_DELAY_MS, type DisplayItem, type PromptJob, type ArtStyle } from '@/lib/artbot-config';
 import { generateImageFromPrompt } from '@/ai/flows/generate-image-from-prompt';
@@ -56,6 +56,9 @@ const ImageGeneratorApp = () => {
   const [moneyAnimationKey, setMoneyAnimationKey] = useState(0);
 
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isPasswordProtectionGloballyDisabled, setIsPasswordProtectionGloballyDisabled] = useState(false);
+  const [globalProtectionButtonText, setGlobalProtectionButtonText] = useState('');
+
 
   useEffect(() => {
     const storedTheme = localStorage.getItem('theme');
@@ -68,6 +71,21 @@ const ImageGeneratorApp = () => {
       setIsDarkMode(false);
     }
   }, []);
+
+  useEffect(() => {
+    // Initialize app state if password protection is globally disabled
+    // This effect runs on mount and when isPasswordProtectionGloballyDisabled changes.
+    if (isPasswordProtectionGloballyDisabled && !currentUserIsAdmin && !isAuthenticated) {
+      // If protection is off, and no admin is logged in, and not already "authenticated" by this mode
+      setIsAuthenticated(true); // Grant access to the app content
+      setGreetingMessage("Modo de Acceso Abierto. Funcionalidad completa disponible.");
+      // No specific user animation
+    }
+     setGlobalProtectionButtonText(
+      isPasswordProtectionGloballyDisabled ? "Activar Protección Global" : "Desactivar Protección Global"
+    );
+  }, [isPasswordProtectionGloballyDisabled, currentUserIsAdmin, isAuthenticated]);
+
 
   const toggleDarkMode = () => {
     setIsDarkMode(prevMode => {
@@ -89,7 +107,7 @@ const ImageGeneratorApp = () => {
       greeting: "Hola, Amo.",
       animation: () => { setShowTechEffect(true); setTechEffectKey(Date.now()); },
       isAdmin: true,
-      isEnabledGlobal: true,
+      isEnabledGlobal: true, 
     },
     "Patrona1": {
       greeting: "Hola, amor de mi vida",
@@ -153,56 +171,66 @@ const ImageGeneratorApp = () => {
     const submittedPassword = passwordInput; 
     const config = allPasswordConfigs[submittedPassword];
 
-    if (showDirectAdminLogin) {
-      if (submittedPassword === "Chispart123") {
+    if (showDirectAdminLogin) { // This mode is only for "Chispart123"
+      if (submittedPassword === "Chispart123" && allPasswordConfigs["Chispart123"]) {
         setIsAuthenticated(true);
         setGreetingMessage(allPasswordConfigs["Chispart123"].greeting);
         allPasswordConfigs["Chispart123"].animation();
         setCurrentUserIsAdmin(true); 
         setAuthError('');
-        setPasswordInput('');
-        setShowDirectAdminLogin(false); 
-        setIsAdminPanelVisible(false);
+        //setShowDirectAdminLogin(false); // Keep it true if we want to indicate "admin mode"
       } else {
         setAuthError('Contraseña de administrador incorrecta.');
         setGreetingMessage('');
         setCurrentUserIsAdmin(false);
       }
+      setPasswordInput(''); 
       return;
     }
 
+    // Normal login flow (when global protection is ON)
     if (config && config.isEnabledGlobal) {
       setIsAuthenticated(true);
       setGreetingMessage(config.greeting);
       config.animation();
-      if (config.isAdmin) {
-        setCurrentUserIsAdmin(true);
-      } else {
-        setCurrentUserIsAdmin(false);
-      }
+      setCurrentUserIsAdmin(!!config.isAdmin);
       setAuthError('');
-      setPasswordInput(''); 
-      setIsAdminPanelVisible(false);
+      setIsAdminPanelVisible(false); // Hide panel on new login, admin can reopen
     } else {
       setAuthError('Contraseña incorrecta o deshabilitada.');
       setGreetingMessage('');
       setCurrentUserIsAdmin(false);
     }
+    setPasswordInput(''); 
   };
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
-    setGreetingMessage('');
+    resetAnimations();
+    setIsAdminPanelVisible(false);
+    
+    const isAdminLoggingOut = currentUserIsAdmin;
+    setCurrentUserIsAdmin(false); // Always reset admin status
+
+    // Reset UI states for login form
     setPasswordInput('');
     setAuthError('');
-    setIsAdminPanelVisible(false);
-    setCurrentUserIsAdmin(false);
     setShowDirectAdminLogin(false);
-    resetAnimations();
+
+    // Reset app-specific states
     setDisplayList([]);
     setProcessingJobs([]);
     setIsBatchProcessing(false);
     setCurrentJobIndexInQueue(null);
+
+    if (isPasswordProtectionGloballyDisabled && isAdminLoggingOut) {
+        // Admin logged out, but global protection is off, so revert to open access mode
+        setIsAuthenticated(true); 
+        setGreetingMessage("Modo de Acceso Abierto. Funcionalidad completa disponible.");
+    } else {
+        // Normal user logout, or admin logout when global protection is ON
+        setIsAuthenticated(false); 
+        setGreetingMessage('');
+    }
   };
   
   const togglePasswordGlobalEnable = (passwordKey: string, checked: boolean) => {
@@ -212,8 +240,26 @@ const ImageGeneratorApp = () => {
     }));
   };
 
-  const handleAdminLogoutFromPanel = () => {
-    setIsAdminPanelVisible(false);
+  const handleToggleGlobalProtection = () => {
+    setIsPasswordProtectionGloballyDisabled(prev => {
+      const newState = !prev;
+      if (newState) { // Protection is being DISABLED
+        // If the admin is currently logged in, their session remains.
+        // If no one is logged in, or a normal user was, this will grant open access on next render cycle.
+        if (!currentUserIsAdmin) { // If an admin is not already logged in
+            setIsAuthenticated(true); // Grant open access
+            setGreetingMessage("Modo de Acceso Abierto. Funcionalidad completa disponible.");
+        }
+      } else { // Protection is being ENABLED
+        // If an admin is logged in, their session remains.
+        // If it was in open access mode, now it requires login.
+        if (!currentUserIsAdmin) { // If an admin is not already logged in
+            setIsAuthenticated(false); // Require login
+            setGreetingMessage("");
+        }
+      }
+      return newState;
+    });
   };
 
 
@@ -324,7 +370,7 @@ const ImageGeneratorApp = () => {
           alert("Por favor, ingresa un prompt.");
           return;
         }
-        const currentAiJobsCount = processingJobs.filter(job => job.type === 'prompt').length;
+        const currentAiJobsCount = processingJobs.filter(j => j.type === 'prompt').length;
         if (currentAiJobsCount >= MAX_PROCESSING_JOBS) {
             alert(`No puedes agregar más de ${MAX_PROCESSING_JOBS} prompts de IA a la cola para procesar en este lote.`);
             return;
@@ -439,6 +485,20 @@ const ImageGeneratorApp = () => {
                      displayList.length < MAX_PROMPTS_OVERALL &&
                      (inputMode !== 'prompt_only' && inputMode !== 'title_prompt' || aiJobsInQueueCount < MAX_PROCESSING_JOBS || (inputMode === 'title_prompt' && !promptForTitleInput.trim() && titleInput.trim()));
 
+  const showLoginForm = !isAuthenticated && (!isPasswordProtectionGloballyDisabled || showDirectAdminLogin);
+
+  // Determine current greeting and menu options based on auth state
+  let currentGreeting = greetingMessage;
+  let showAdminPanelInMenu = currentUserIsAdmin;
+  let showLogoutInMenu = isAuthenticated && ! (isPasswordProtectionGloballyDisabled && !currentUserIsAdmin) ;
+  let showLoginAdminInMenu = isPasswordProtectionGloballyDisabled && !currentUserIsAdmin;
+
+  if (isPasswordProtectionGloballyDisabled && !currentUserIsAdmin && isAuthenticated) {
+     // This case is when global protection is off, and the "isAuthenticated" is true due to open access
+     // but an admin hasn't specifically logged in yet.
+    currentGreeting = "Modo de Acceso Abierto. Funcionalidad completa disponible.";
+  }
+
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-4 font-body relative overflow-hidden">
@@ -449,7 +509,7 @@ const ImageGeneratorApp = () => {
       {isAuthenticated && showAccessDeniedEffect && <AccessDeniedEffect animationKey={accessDeniedEffectKey} onAnimationEnd={() => setShowAccessDeniedEffect(false)} />}
       {isAuthenticated && showMoneyAnimation && <MoneyRain animationKey={moneyAnimationKey} onAnimationEnd={() => setShowMoneyAnimation(false)} />}
             
-      {!isAuthenticated ? (
+      {showLoginForm ? (
          <Card className="relative z-10 w-full max-w-md bg-card/90 backdrop-blur-sm shadow-2xl shadow-primary/30 rounded-xl">
            <CardHeader className="text-center">
              <div className="flex items-center justify-center mb-2">
@@ -463,10 +523,17 @@ const ImageGeneratorApp = () => {
              </CardDescription>
            </CardHeader>
            <CardContent>
-             {areNonAdminPasswordsDisabled && !showDirectAdminLogin ? (
+             {areNonAdminPasswordsDisabled && !showDirectAdminLogin && !isPasswordProtectionGloballyDisabled ? (
                <div className="text-center space-y-4">
                  <p className="text-muted-foreground">El acceso general está deshabilitado.</p>
-                 <Button onClick={() => setShowDirectAdminLogin(true)} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                 <Button 
+                    onClick={() => {
+                        setShowDirectAdminLogin(true); 
+                        setAuthError(''); 
+                        setPasswordInput('');
+                    }} 
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                 >
                    <Shield className="mr-2 h-5 w-5" /> Acceso de Administrador
                  </Button>
                </div>
@@ -511,7 +578,7 @@ const ImageGeneratorApp = () => {
         <div className="w-full max-w-3xl mt-16 sm:mt-0"> 
             <Card className="relative z-10 w-full bg-card/90 backdrop-blur-sm shadow-2xl shadow-primary/30 rounded-xl">
             <CardHeader className="text-center">
-              {greetingMessage && (
+              {currentGreeting && (
                 <div className="relative mb-4 p-3 bg-primary/10 border border-primary/30 rounded-lg">
                   <div className="absolute top-1/2 left-3 transform -translate-y-1/2 z-10">
                      <DropdownMenu>
@@ -526,22 +593,38 @@ const ImageGeneratorApp = () => {
                            {isDarkMode ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
                            <span>Cambiar a tema {isDarkMode ? 'claro' : 'oscuro'}</span>
                          </DropdownMenuItem>
-                         {currentUserIsAdmin && (
+                         {showAdminPanelInMenu && (
                            <DropdownMenuItem onClick={() => setIsAdminPanelVisible(true)} className="cursor-pointer">
                              <ShieldCheck className="mr-2 h-4 w-4" />
                              <span>Panel de Administrador</span>
                            </DropdownMenuItem>
                          )}
-                         <DropdownMenuSeparator />
-                         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive-foreground focus:bg-destructive">
-                           <LogOut className="mr-2 h-4 w-4" />
-                           <span>Cerrar Sesión</span>
-                         </DropdownMenuItem>
+                         {showLoginAdminInMenu && (
+                            <DropdownMenuItem 
+                                onClick={() => {
+                                    setIsAuthenticated(false); // This will trigger login form
+                                    setShowDirectAdminLogin(true);
+                                    setAuthError('');
+                                    setPasswordInput('');
+                                }} 
+                                className="cursor-pointer"
+                            >
+                                <LogIn className="mr-2 h-4 w-4 text-primary" />
+                                <span>Iniciar Sesión (Admin)</span>
+                            </DropdownMenuItem>
+                         )}
+                         {(showLogoutInMenu || currentUserIsAdmin) && <DropdownMenuSeparator />}
+                         {(showLogoutInMenu || currentUserIsAdmin) && (
+                           <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive-foreground focus:bg-destructive">
+                             <LogOut className="mr-2 h-4 w-4" />
+                             <span>Cerrar Sesión</span>
+                           </DropdownMenuItem>
+                         )}
                        </DropdownMenuContent>
                      </DropdownMenu>
                   </div>
                   <p className="text-lg font-medium text-primary flex items-center justify-center text-center">
-                    <Smile size={22} className="mr-2 text-accent" /> {greetingMessage}
+                    <Smile size={22} className="mr-2 text-accent" /> {currentGreeting}
                   </p>
                 </div>
               )}
@@ -795,16 +878,42 @@ const ImageGeneratorApp = () => {
                     <ShieldCheck className="mr-3 h-7 w-7"/> Panel de Administrador
                 </CardTitle>
                 <CardDescription>
-                  Gestionar la disponibilidad de las contraseñas. Los cambios son por sesión.
+                  Gestionar la disponibilidad de las contraseñas.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-4">
+                 <div className="p-3 bg-primary/10 rounded-lg border border-primary/30">
+                    <Label className="flex items-center text-md font-medium text-primary mb-2">
+                        <GlobeLock className="mr-2 h-5 w-5"/> Protección Global por Contraseña
+                    </Label>
+                    <Button
+                        onClick={handleToggleGlobalProtection}
+                        variant={isPasswordProtectionGloballyDisabled ? "destructive" : "default"}
+                        className="w-full"
+                    >
+                        {isPasswordProtectionGloballyDisabled ? 
+                            <><CheckCircle className="mr-2 h-5 w-5"/> Activar Protección Global</> : 
+                            <><Lock className="mr-2 h-5 w-5"/> Desactivar Protección Global</>
+                        }
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2">
+                        {isPasswordProtectionGloballyDisabled ? 
+                            "La aplicación está actualmente en modo de acceso abierto. Cualquiera puede usarla sin contraseña." :
+                            "La aplicación requiere contraseña para acceder. Desactiva para permitir acceso público."
+                        }
+                    </p>
+                </div>
+
+                <h4 className="text-lg font-semibold text-accent pt-2 border-t border-border">Contraseñas Individuales:</h4>
                 {Object.entries(allPasswordConfigs)
                   .filter(([key, config]) => !config.isAdmin)
                   .map(([key, config]) => (
                     <div 
                       key={key} 
-                      className="flex items-center justify-between p-3 bg-background/60 rounded-lg border border-border hover:border-primary/50 transition-colors"
+                      className={cn(
+                        "flex items-center justify-between p-3 bg-background/60 rounded-lg border border-border hover:border-primary/50 transition-colors",
+                        isPasswordProtectionGloballyDisabled && "opacity-50 cursor-not-allowed" 
+                      )}
                     >
                       <div className="flex flex-col">
                         <Label htmlFor={`switch-${key}`} className="text-md font-medium text-foreground cursor-pointer">
@@ -817,12 +926,13 @@ const ImageGeneratorApp = () => {
                         checked={config.isEnabledGlobal}
                         onCheckedChange={(checked) => togglePasswordGlobalEnable(key, checked)}
                         aria-label={`Habilitar o deshabilitar contraseña ${key}`}
+                        disabled={isPasswordProtectionGloballyDisabled}
                       />
                     </div>
                 ))}
                 <Button 
                   variant="outline" 
-                  onClick={handleAdminLogoutFromPanel} 
+                  onClick={() => setIsAdminPanelVisible(false)} 
                   className="w-full mt-4 border-primary text-primary hover:bg-primary/10 hover:text-primary"
                 >
                     <LogOut className="mr-2 h-4 w-4"/> Ocultar Panel de Admin
