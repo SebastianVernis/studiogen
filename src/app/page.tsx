@@ -150,7 +150,7 @@ const ImageGeneratorApp = () => {
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     resetAnimations();
-    const submittedPassword = passwordInput; // Store before clearing
+    const submittedPassword = passwordInput; 
     const config = allPasswordConfigs[submittedPassword];
 
     if (showDirectAdminLogin) {
@@ -158,11 +158,11 @@ const ImageGeneratorApp = () => {
         setIsAuthenticated(true);
         setGreetingMessage(allPasswordConfigs["Chispart123"].greeting);
         allPasswordConfigs["Chispart123"].animation();
-        setIsAdminPanelVisible(true);
-        setCurrentUserIsAdmin(true);
+        setCurrentUserIsAdmin(true); 
         setAuthError('');
         setPasswordInput('');
         setShowDirectAdminLogin(false); 
+        setIsAdminPanelVisible(false); // Asegurar que el panel admin esté oculto al inicio
       } else {
         setAuthError('Contraseña de administrador incorrecta.');
         setGreetingMessage('');
@@ -176,13 +176,13 @@ const ImageGeneratorApp = () => {
       setGreetingMessage(config.greeting);
       config.animation();
       if (config.isAdmin) {
-        setIsAdminPanelVisible(true);
         setCurrentUserIsAdmin(true);
       } else {
         setCurrentUserIsAdmin(false);
       }
       setAuthError('');
-      setPasswordInput(''); // Clear password after successful login
+      setPasswordInput(''); 
+      setIsAdminPanelVisible(false); // Asegurar que el panel admin esté oculto al inicio
     } else {
       setAuthError('Contraseña incorrecta o deshabilitada.');
       setGreetingMessage('');
@@ -199,7 +199,6 @@ const ImageGeneratorApp = () => {
     setCurrentUserIsAdmin(false);
     setShowDirectAdminLogin(false);
     resetAnimations();
-    // Reset app specific states if needed
     setDisplayList([]);
     setProcessingJobs([]);
     setIsBatchProcessing(false);
@@ -215,14 +214,12 @@ const ImageGeneratorApp = () => {
 
   const handleAdminLogoutFromPanel = () => {
     setIsAdminPanelVisible(false);
-    // Note: This only hides the panel, doesn't log out the admin from the app.
   };
 
 
   useEffect(() => {
     if (!isBatchProcessing || currentJobIndexInQueue === null || currentJobIndexInQueue >= processingJobs.length) {
       if (isBatchProcessing && processingJobs.length > 0 && currentJobIndexInQueue !== null && currentJobIndexInQueue >= processingJobs.length) {
-         // Batch finished
       }
       if (isBatchProcessing) {
         setIsBatchProcessing(false); 
@@ -510,7 +507,6 @@ const ImageGeneratorApp = () => {
            </CardContent>
          </Card>
       ) : (
-        // Main App Content when Authenticated
         <>
         <div className="absolute top-4 left-4 z-50">
             <DropdownMenu>
@@ -540,7 +536,7 @@ const ImageGeneratorApp = () => {
             </DropdownMenu>
           </div>
 
-        <div className="w-full max-w-3xl mt-16 sm:mt-0"> {/* Added margin-top for mobile to avoid overlap with menu */}
+        <div className="w-full max-w-3xl mt-16 sm:mt-0"> 
             <Card className="relative z-10 w-full bg-card/90 backdrop-blur-sm shadow-2xl shadow-primary/30 rounded-xl">
             <CardHeader className="text-center">
               {greetingMessage && (
