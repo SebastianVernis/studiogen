@@ -555,8 +555,8 @@ const ImageGeneratorApp = () => {
             
       {showLoginForm ? (
          <Card className="relative z-10 w-full max-w-md bg-card/90 backdrop-blur-sm shadow-2xl shadow-primary/30 rounded-xl">
-           <CardHeader className="text-center">
-             <div className="flex items-center justify-center mb-2">
+           <CardHeader className="text-center px-6 pt-4 pb-3 space-y-2">
+             <div className="flex items-center justify-center">
                <Lock className="text-primary w-10 h-10 mr-3" />
                <CardTitle className="text-3xl md:text-4xl font-headline tracking-tight">
                  {showDirectAdminLogin ? "Acceso Admin" : "Acceso Requerido"}
@@ -621,9 +621,9 @@ const ImageGeneratorApp = () => {
         <>
         <div className="w-full max-w-3xl mt-16 sm:mt-0"> 
             <Card className="relative z-10 w-full bg-card/90 backdrop-blur-sm shadow-2xl shadow-primary/30 rounded-xl">
-            <CardHeader className="text-center">
+            <CardHeader className="text-center px-6 pt-4 pb-3 space-y-2">
               {currentGreeting && (
-                <div className="relative mb-4 p-3 bg-primary/10 border border-primary/30 rounded-lg">
+                <div className="relative p-2 bg-primary/10 border border-primary/30 rounded-lg">
                   <div className="absolute top-1/2 left-3 transform -translate-y-1/2 z-10">
                      <DropdownMenu>
                        <DropdownMenuTrigger asChild>
@@ -672,7 +672,7 @@ const ImageGeneratorApp = () => {
                   </p>
                 </div>
               )}
-              <div className="flex items-center justify-center mb-2">
+              <div className="flex items-center justify-center">
                 <Sparkles className="text-accent w-10 h-10 mr-3" />
                 <CardTitle className="text-3xl md:text-4xl font-headline tracking-tight bg-gradient-to-r from-accent via-primary to-accent text-transparent bg-clip-text">
                   Chispart Generator
@@ -1024,3 +1024,5 @@ const ImageGeneratorApp = () => {
 };
 
 export default ImageGeneratorApp;
+
+    
