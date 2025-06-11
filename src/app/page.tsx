@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart, Cpu, CircuitBoard, Music2, Disc3, ActivitySquare, Ban, AlertOctagon, Code2, DollarSign, Landmark, CreditCard } from 'lucide-react';
+import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart, Cpu, CircuitBoard, Music2, Disc3, ActivitySquare, Ban, AlertOctagon, Code2, DollarSign, Landmark, CreditCard, Shield, ShieldCheck, LogOut } from 'lucide-react';
 import FuturisticBackground from '@/components/futuristic-background';
 import { artStyles, MAX_PROMPTS_OVERALL, MAX_PROCESSING_JOBS, DOWNLOAD_DELAY_MS, type DisplayItem, type PromptJob, type ArtStyle } from '@/lib/artbot-config';
 import { generateImageFromPrompt } from '@/ai/flows/generate-image-from-prompt';
@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import HeartRain from '@/components/ui/heart-rain';
 import TechEffect from '@/components/ui/tech-effect';
@@ -28,12 +29,11 @@ const isValidImageUrl = (url: string): boolean => {
 
 type InputMode = 'url' | 'title_prompt' | 'prompt_only';
 
-const passwordGreetings: Record<string, string> = {
-  "Chispart123": "Hola, Amo.",
-  "Patrona1": "Hola, amor de mi vida",
-  "ChispukAdmin": "El que no baila no opina",
-  "supersecretpassword": "¿Tú qué haces aquí? ¡LARGO!",
-  "Miau1234*": "¡A hacer billetes, Miau!"
+type PasswordConfig = {
+  greeting: string;
+  animation: () => void;
+  isAdmin?: boolean;
+  isEnabledGlobal: boolean;
 };
 
 const ImageGeneratorApp = () => {
@@ -53,6 +53,42 @@ const ImageGeneratorApp = () => {
   const [showMoneyAnimation, setShowMoneyAnimation] = useState(false);
   const [moneyAnimationKey, setMoneyAnimationKey] = useState(0);
 
+  const initialPasswordConfigs: Record<string, PasswordConfig> = {
+    "Chispart123": {
+      greeting: "Hola, Amo.",
+      animation: () => { setShowTechEffect(true); setTechEffectKey(Date.now()); },
+      isAdmin: true,
+      isEnabledGlobal: true,
+    },
+    "Patrona1": {
+      greeting: "Hola, amor de mi vida",
+      animation: () => { setShowHeartAnimation(true); setHeartAnimationKey(Date.now()); },
+      isEnabledGlobal: true,
+    },
+    "ChispukAdmin": {
+      greeting: "El que no baila no opina",
+      animation: () => { setShowMusicVibes(true); setMusicVibesKey(Date.now()); },
+      isEnabledGlobal: true,
+    },
+    "supersecretpassword": {
+      greeting: "¿Tú qué haces aquí? ¡LARGO!",
+      animation: () => { setShowAccessDeniedEffect(true); setAccessDeniedEffectKey(Date.now()); },
+      isEnabledGlobal: true,
+    },
+    "Miau1234*": {
+      greeting: "¡A hacer billetes, Miau!",
+      animation: () => { setShowMoneyAnimation(true); setMoneyAnimationKey(Date.now()); },
+      isEnabledGlobal: true,
+    }
+  };
+
+  const [allPasswordConfigs, setAllPasswordConfigs] = useState<Record<string, PasswordConfig>>(initialPasswordConfigs);
+  const [isAdminPanelVisible, setIsAdminPanelVisible] = useState(false);
+  const [showDirectAdminLogin, setShowDirectAdminLogin] = useState(false);
+
+  const areNonAdminPasswordsDisabled = Object.values(allPasswordConfigs)
+    .filter(config => !config.isAdmin)
+    .every(config => !config.isEnabledGlobal);
 
   const [inputMode, setInputMode] = useState<InputMode>('prompt_only');
   const [urlInput, setUrlInput] = useState('');
@@ -78,35 +114,53 @@ const ImageGeneratorApp = () => {
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    resetAnimations(); 
-    const greeting = passwordGreetings[passwordInput];
-    if (greeting) {
-      setIsAuthenticated(true);
-      setGreetingMessage(greeting);
-      setAuthError('');
+    resetAnimations();
+    const config = allPasswordConfigs[passwordInput];
 
-      if (passwordInput === "Patrona1") {
-        setShowHeartAnimation(true);
-        setHeartAnimationKey(Date.now());
-      } else if (passwordInput === "Chispart123") {
-        setShowTechEffect(true);
-        setTechEffectKey(Date.now());
-      } else if (passwordInput === "ChispukAdmin") {
-        setShowMusicVibes(true);
-        setMusicVibesKey(Date.now());
-      } else if (passwordInput === "supersecretpassword") {
-        setShowAccessDeniedEffect(true);
-        setAccessDeniedEffectKey(Date.now());
-      } else if (passwordInput === "Miau1234*") {
-        setShowMoneyAnimation(true);
-        setMoneyAnimationKey(Date.now());
+    if (showDirectAdminLogin) {
+      if (passwordInput === "Chispart123") {
+        setIsAuthenticated(true);
+        setGreetingMessage(allPasswordConfigs["Chispart123"].greeting);
+        allPasswordConfigs["Chispart123"].animation();
+        setIsAdminPanelVisible(true);
+        setAuthError('');
+        setPasswordInput('');
+        setShowDirectAdminLogin(false); 
+      } else {
+        setAuthError('Contraseña de administrador incorrecta.');
+        setGreetingMessage('');
       }
-      setPasswordInput(''); 
+      return;
+    }
+
+    if (config && config.isEnabledGlobal) {
+      setIsAuthenticated(true);
+      setGreetingMessage(config.greeting);
+      config.animation();
+      if (config.isAdmin) {
+        setIsAdminPanelVisible(true);
+      }
+      setAuthError('');
+      setPasswordInput('');
     } else {
-      setAuthError('Contraseña incorrecta. Inténtalo de nuevo.');
+      setAuthError('Contraseña incorrecta o deshabilitada.');
       setGreetingMessage('');
     }
   };
+  
+  const togglePasswordGlobalEnable = (passwordKey: string, checked: boolean) => {
+    setAllPasswordConfigs(prev => ({
+      ...prev,
+      [passwordKey]: { ...prev[passwordKey], isEnabledGlobal: checked }
+    }));
+  };
+
+  const handleAdminLogoutFromPanel = () => {
+    setIsAdminPanelVisible(false);
+    // Note: This only hides the panel, doesn't log out the admin from the app.
+    // If all other passwords are disabled, the main login will still show admin direct login if the page is reloaded or session ends.
+  };
+
 
   useEffect(() => {
     if (!isBatchProcessing || currentJobIndexInQueue === null || currentJobIndexInQueue >= processingJobs.length) {
@@ -342,49 +396,67 @@ const ImageGeneratorApp = () => {
       {isAuthenticated && showAccessDeniedEffect && <AccessDeniedEffect animationKey={accessDeniedEffectKey} onAnimationEnd={() => setShowAccessDeniedEffect(false)} />}
       {isAuthenticated && showMoneyAnimation && <MoneyRain animationKey={moneyAnimationKey} onAnimationEnd={() => setShowMoneyAnimation(false)} />}
             
-      <Card className="relative z-10 w-full max-w-3xl bg-card/90 backdrop-blur-sm shadow-2xl shadow-primary/30 rounded-xl">
-        {!isAuthenticated ? (
-          <>
-            <CardHeader className="text-center">
-               <div className="flex items-center justify-center mb-2">
-                <Lock className="text-primary w-10 h-10 mr-3" />
-                <CardTitle className="text-3xl md:text-4xl font-headline tracking-tight">
-                  Acceso Requerido
-                </CardTitle>
-              </div>
-              <CardDescription className="text-muted-foreground text-sm md:text-base">
-                Por favor, ingresa la contraseña para continuar.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handlePasswordSubmit} className="space-y-6">
-                <div>
-                  <Label htmlFor="passwordInput" className="block mb-2 text-sm font-medium text-accent">
-                    Contraseña:
-                  </Label>
-                  <Input
-                    id="passwordInput"
-                    type="password"
-                    className="w-full p-3 bg-background/70 border-primary border-2 rounded-lg focus-visible:ring-accent focus-visible:border-accent transition-all duration-300 ease-in-out placeholder:text-muted-foreground"
-                    placeholder="********"
-                    value={passwordInput}
-                    onChange={(e) => setPasswordInput(e.target.value)}
-                  />
-                </div>
-                {authError && (
-                  <p className="text-sm text-destructive bg-destructive/20 p-2 rounded-md text-center">{authError}</p>
-                )}
-                <Button
-                  type="submit"
-                  className="w-full text-white font-semibold py-3 px-4 text-lg bg-primary hover:bg-primary/90 focus:ring-4 focus:ring-primary/50"
-                >
-                  <LogIn className="w-6 h-6 mr-2" /> Ingresar
-                </Button>
-              </form>
-            </CardContent>
-          </>
-        ) : (
-          <>
+      {!isAuthenticated ? (
+         <Card className="relative z-10 w-full max-w-md bg-card/90 backdrop-blur-sm shadow-2xl shadow-primary/30 rounded-xl">
+           <CardHeader className="text-center">
+             <div className="flex items-center justify-center mb-2">
+               <Lock className="text-primary w-10 h-10 mr-3" />
+               <CardTitle className="text-3xl md:text-4xl font-headline tracking-tight">
+                 {showDirectAdminLogin ? "Acceso Admin" : "Acceso Requerido"}
+               </CardTitle>
+             </div>
+             <CardDescription className="text-muted-foreground text-sm md:text-base">
+               {showDirectAdminLogin ? "Ingresa la contraseña de administrador." : "Por favor, ingresa la contraseña para continuar."}
+             </CardDescription>
+           </CardHeader>
+           <CardContent>
+             {areNonAdminPasswordsDisabled && !showDirectAdminLogin ? (
+               <div className="text-center space-y-4">
+                 <p className="text-muted-foreground">El acceso general está deshabilitado.</p>
+                 <Button onClick={() => setShowDirectAdminLogin(true)} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                   <Shield className="mr-2 h-5 w-5" /> Acceso de Administrador
+                 </Button>
+               </div>
+             ) : (
+               <form onSubmit={handlePasswordSubmit} className="space-y-6">
+                 {showDirectAdminLogin && (
+                   <p className="text-center font-semibold text-primary p-2 bg-primary/10 rounded-md">Modo de acceso: Solo Administrador</p>
+                 )}
+                 <div>
+                   <Label htmlFor="passwordInput" className="block mb-2 text-sm font-medium text-accent">
+                     Contraseña:
+                   </Label>
+                   <Input
+                     id="passwordInput"
+                     type="password"
+                     className="w-full p-3 bg-background/70 border-primary border-2 rounded-lg focus-visible:ring-accent focus-visible:border-accent transition-all duration-300 ease-in-out placeholder:text-muted-foreground"
+                     placeholder="********"
+                     value={passwordInput}
+                     onChange={(e) => setPasswordInput(e.target.value)}
+                   />
+                 </div>
+                 {authError && (
+                   <p className="text-sm text-destructive bg-destructive/20 p-2 rounded-md text-center">{authError}</p>
+                 )}
+                 <Button
+                   type="submit"
+                   className="w-full text-white font-semibold py-3 px-4 text-lg bg-primary hover:bg-primary/90 focus:ring-4 focus:ring-primary/50"
+                 >
+                   <LogIn className="w-6 h-6 mr-2" /> {showDirectAdminLogin ? "Acceder como Admin" : "Ingresar"}
+                 </Button>
+                 {showDirectAdminLogin && (
+                    <Button variant="outline" onClick={() => {setShowDirectAdminLogin(false); setAuthError(''); setPasswordInput('');}} className="w-full mt-2">
+                        Volver al inicio de sesión normal
+                    </Button>
+                 )}
+               </form>
+             )}
+           </CardContent>
+         </Card>
+      ) : (
+        // Main App Content when Authenticated
+        <div className="w-full max-w-3xl">
+            <Card className="relative z-10 w-full bg-card/90 backdrop-blur-sm shadow-2xl shadow-primary/30 rounded-xl">
             <CardHeader className="text-center">
               {greetingMessage && (
                 <div className="mb-4 p-3 bg-primary/10 border border-primary/30 rounded-lg text-center">
@@ -634,9 +706,52 @@ const ImageGeneratorApp = () => {
                 </p>
               </footer>
             </CardContent>
-          </>
-        )}
-      </Card>
+          </Card>
+
+          {isAdminPanelVisible && (
+            <Card className="mt-6 relative z-10 w-full bg-card/90 backdrop-blur-sm shadow-xl shadow-primary/40 rounded-xl">
+              <CardHeader>
+                <CardTitle className="flex items-center text-2xl text-primary">
+                    <ShieldCheck className="mr-3 h-7 w-7"/> Panel de Administrador
+                </CardTitle>
+                <CardDescription>
+                  Gestionar la disponibilidad de las contraseñas. Los cambios son por sesión.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {Object.entries(allPasswordConfigs)
+                  .filter(([key, config]) => !config.isAdmin)
+                  .map(([key, config]) => (
+                    <div 
+                      key={key} 
+                      className="flex items-center justify-between p-3 bg-background/60 rounded-lg border border-border hover:border-primary/50 transition-colors"
+                    >
+                      <div className="flex flex-col">
+                        <Label htmlFor={`switch-${key}`} className="text-md font-medium text-foreground cursor-pointer">
+                          {key}
+                        </Label>
+                        <span className="text-xs text-muted-foreground">"{config.greeting}"</span>
+                      </div>
+                      <Switch
+                        id={`switch-${key}`}
+                        checked={config.isEnabledGlobal}
+                        onCheckedChange={(checked) => togglePasswordGlobalEnable(key, checked)}
+                        aria-label={`Habilitar o deshabilitar contraseña ${key}`}
+                      />
+                    </div>
+                ))}
+                <Button 
+                  variant="outline" 
+                  onClick={handleAdminLogoutFromPanel} 
+                  className="w-full mt-4 border-primary text-primary hover:bg-primary/10 hover:text-primary"
+                >
+                    <LogOut className="mr-2 h-4 w-4"/> Ocultar Panel de Admin
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
     </div>
   );
 };
