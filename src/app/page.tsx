@@ -162,7 +162,7 @@ const ImageGeneratorApp = () => {
         setAuthError('');
         setPasswordInput('');
         setShowDirectAdminLogin(false); 
-        setIsAdminPanelVisible(false); // Asegurar que el panel admin esté oculto al inicio
+        setIsAdminPanelVisible(false);
       } else {
         setAuthError('Contraseña de administrador incorrecta.');
         setGreetingMessage('');
@@ -182,7 +182,7 @@ const ImageGeneratorApp = () => {
       }
       setAuthError('');
       setPasswordInput(''); 
-      setIsAdminPanelVisible(false); // Asegurar que el panel admin esté oculto al inicio
+      setIsAdminPanelVisible(false);
     } else {
       setAuthError('Contraseña incorrecta o deshabilitada.');
       setGreetingMessage('');
@@ -508,40 +508,39 @@ const ImageGeneratorApp = () => {
          </Card>
       ) : (
         <>
-        <div className="absolute top-4 left-4 z-50">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="bg-card/80 hover:bg-card backdrop-blur-sm">
-                  <MenuIcon className="h-5 w-5 text-primary" />
-                  <span className="sr-only">Abrir menú</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuItem onClick={toggleDarkMode} className="cursor-pointer">
-                  {isDarkMode ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
-                  <span>Cambiar a tema {isDarkMode ? 'claro' : 'oscuro'}</span>
-                </DropdownMenuItem>
-                {currentUserIsAdmin && (
-                  <DropdownMenuItem onClick={() => setIsAdminPanelVisible(true)} className="cursor-pointer">
-                    <ShieldCheck className="mr-2 h-4 w-4" />
-                    <span>Panel de Administrador</span>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive-foreground focus:bg-destructive">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Cerrar Sesión</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
         <div className="w-full max-w-3xl mt-16 sm:mt-0"> 
             <Card className="relative z-10 w-full bg-card/90 backdrop-blur-sm shadow-2xl shadow-primary/30 rounded-xl">
             <CardHeader className="text-center">
               {greetingMessage && (
-                <div className="mb-4 p-3 bg-primary/10 border border-primary/30 rounded-lg text-center">
-                  <p className="text-lg font-medium text-primary flex items-center justify-center">
+                <div className="relative mb-4 p-3 bg-primary/10 border border-primary/30 rounded-lg">
+                  <div className="absolute top-1/2 left-3 transform -translate-y-1/2 z-10">
+                     <DropdownMenu>
+                       <DropdownMenuTrigger asChild>
+                         <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:bg-primary/20">
+                           <MenuIcon className="h-5 w-5" />
+                           <span className="sr-only">Abrir menú</span>
+                         </Button>
+                       </DropdownMenuTrigger>
+                       <DropdownMenuContent align="start">
+                         <DropdownMenuItem onClick={toggleDarkMode} className="cursor-pointer">
+                           {isDarkMode ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
+                           <span>Cambiar a tema {isDarkMode ? 'claro' : 'oscuro'}</span>
+                         </DropdownMenuItem>
+                         {currentUserIsAdmin && (
+                           <DropdownMenuItem onClick={() => setIsAdminPanelVisible(true)} className="cursor-pointer">
+                             <ShieldCheck className="mr-2 h-4 w-4" />
+                             <span>Panel de Administrador</span>
+                           </DropdownMenuItem>
+                         )}
+                         <DropdownMenuSeparator />
+                         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive-foreground focus:bg-destructive">
+                           <LogOut className="mr-2 h-4 w-4" />
+                           <span>Cerrar Sesión</span>
+                         </DropdownMenuItem>
+                       </DropdownMenuContent>
+                     </DropdownMenu>
+                  </div>
+                  <p className="text-lg font-medium text-primary flex items-center justify-center text-center">
                     <Smile size={22} className="mr-2 text-accent" /> {greetingMessage}
                   </p>
                 </div>
