@@ -60,7 +60,7 @@ const ImageGeneratorApp = () => {
   const [moneyAnimationKey, setMoneyAnimationKey] = useState(0);
 
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isPasswordProtectionGloballyDisabled, setIsPasswordProtectionGloballyDisabled] = useState(false);
+  const [isPasswordProtectionGloballyDisabled, setIsPasswordProtectionGloballyDisabled] = useState(true);
   const [globalProtectionButtonText, setGlobalProtectionButtonText] = useState('');
 
   const [googleDriveApiLoaded, setGoogleDriveApiLoaded] = useState(false);
@@ -123,25 +123,25 @@ const ImageGeneratorApp = () => {
       greeting: "Hola, amor de mi vida",
       animation: () => { setShowHeartAnimation(true); setHeartAnimationKey(Date.now()); },
       isAdmin: false,
-      isEnabledGlobal: true,
+      isEnabledGlobal: false,
     },
     "ChispukAdmin": {
       greeting: "El que no baila no opina",
       animation: () => { setShowMusicVibes(true); setMusicVibesKey(Date.now()); },
       isAdmin: false,
-      isEnabledGlobal: true,
+      isEnabledGlobal: false,
     },
     "supersecretpassword": {
       greeting: "¿Tú qué haces aquí? ¡LARGO!",
       animation: () => { setShowAccessDeniedEffect(true); setAccessDeniedEffectKey(Date.now()); },
       isAdmin: false,
-      isEnabledGlobal: true,
+      isEnabledGlobal: false,
     },
     "Miau1234*": {
       greeting: "¡A hacer billetes, Miau!",
       animation: () => { setShowMoneyAnimation(true); setMoneyAnimationKey(Date.now()); },
       isAdmin: false,
-      isEnabledGlobal: true,
+      isEnabledGlobal: false,
     }
   };
 
@@ -1364,3 +1364,4 @@ const ImageGeneratorApp = () => {
 };
 
 export default ImageGeneratorApp;
+
