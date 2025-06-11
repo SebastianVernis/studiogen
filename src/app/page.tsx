@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart, Cpu, CircuitBoard, Music2, Disc3, ActivitySquare, Ban, AlertOctagon, Code2, DollarSign, Landmark, CreditCard, Shield, ShieldCheck, LogOut, Menu as MenuIcon, Moon, Sun, GlobeLock, CheckCircle, Wand2, UploadCloud } from 'lucide-react';
+import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart, Cpu, CircuitBoard, Music2, Disc3, ActivitySquare, Ban, AlertOctagon, Code2, DollarSign, Landmark, CreditCard, Shield, ShieldCheck, LogOut, Menu as MenuIcon, Moon, Sun, GlobeLock, CheckCircle, Wand2, UploadCloud, FileArchive } from 'lucide-react';
 import FuturisticBackground from '@/components/futuristic-background';
 import { artStyles, MAX_PROMPTS_OVERALL, MAX_PROCESSING_JOBS, DOWNLOAD_DELAY_MS, type DisplayItem, type PromptJob, type ArtStyle } from '@/lib/artbot-config';
 import { generateImageFromPrompt } from '@/ai/flows/generate-image-from-prompt';
@@ -16,6 +16,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import HeartRain from '@/components/ui/heart-rain';
@@ -24,6 +25,7 @@ import MusicVibes from '@/components/ui/music-vibes';
 import AccessDeniedEffect from '@/components/ui/access-denied-effect';
 import MoneyRain from '@/components/ui/money-rain';
 import { useToast } from "@/hooks/use-toast";
+import JSZip from 'jszip';
 
 
 const isValidImageUrl = (url: string): boolean => {
@@ -65,13 +67,43 @@ const ImageGeneratorApp = () => {
 
   const [googleDriveApiLoaded, setGoogleDriveApiLoaded] = useState(false);
   const [isGoogleDriveAuthenticated, setIsGoogleDriveAuthenticated] = useState(false);
+  
   const [uploadingToDriveItemId, setUploadingToDriveItemId] = useState<number | null>(null);
+  const [analyzerUploadingToDriveItemId, setAnalyzerUploadingToDriveItemId] = useState<number | null>(null);
 
-  const [showAdminPromptAnalyzer, setShowAdminPromptAnalyzer] = useState(false);
-  const [adminPromptAnalysisText, setAdminPromptAnalysisText] = useState('');
+
+  // States for Main Generator Tab
+  const [inputMode, setInputMode] = useState<InputMode>('prompt_only');
+  const [urlInput, setUrlInput] = useState('');
+  const [titleInput, setTitleInput] = useState('');
+  const [promptForTitleInput, setPromptForTitleInput] = useState('');
+  const [singlePromptInput, setSinglePromptInput] = useState('');
+  const [displayList, setDisplayList] = useState<DisplayItem[]>([]);
+  const [processingJobs, setProcessingJobs] = useState<PromptJob[]>([]);
+  const [selectedStyleValue, setSelectedStyleValue] = useState<string>(artStyles[0].value);
+  const [isBatchProcessing, setIsBatchProcessing] = useState(false);
+  const [currentJobIndexInQueue, setCurrentJobIndexInQueue] = useState<number | null>(null);
+  const [isDownloadingIndividual, setIsDownloadingIndividual] = useState(false);
+  const [isDownloadingZip, setIsDownloadingZip] = useState(false);
+  const [itemBeingRefined, setItemBeingRefined] = useState<PromptJob | null>(null);
+  const [refinementPromptText, setRefinementPromptText] = useState<string>('');
+  const [isSubmittingRefinement, setIsSubmittingRefinement] = useState<boolean>(false);
+  
+  // States for Analyzer Tab
+  const [analyzerRawText, setAnalyzerRawText] = useState('');
   const [isAnalyzingText, setIsAnalyzingText] = useState(false);
-  const [extractedAdminPrompts, setExtractedAdminPrompts] = useState<string[]>([]);
-  const [isAddingAdminPromptsToQueue, setIsAddingAdminPromptsToQueue] = useState(false);
+  const [analyzerExtractedPrompts, setAnalyzerExtractedPrompts] = useState<string[]>([]);
+  const [isAddingExtractedToAnalyzerQueue, setIsAddingExtractedToAnalyzerQueue] = useState(false);
+  const [analyzerDisplayList, setAnalyzerDisplayList] = useState<DisplayItem[]>([]);
+  const [analyzerProcessingJobs, setAnalyzerProcessingJobs] = useState<PromptJob[]>([]);
+  const [analyzerSelectedStyleValue, setAnalyzerSelectedStyleValue] = useState<string>(artStyles[0].value);
+  const [isAnalyzerBatchProcessing, setIsAnalyzerBatchProcessing] = useState(false);
+  const [currentAnalyzerJobIndexInQueue, setCurrentAnalyzerJobIndexInQueue] = useState<number | null>(null);
+  const [isAnalyzerDownloadingIndividual, setIsAnalyzerDownloadingIndividual] = useState(false);
+  const [isAnalyzerDownloadingZip, setIsAnalyzerDownloadingZip] = useState(false);
+  const [analyzerItemBeingRefined, setAnalyzerItemBeingRefined] = useState<PromptJob | null>(null);
+  const [analyzerRefinementPromptText, setAnalyzerRefinementPromptText] = useState<string>('');
+  const [isAnalyzerSubmittingRefinement, setIsAnalyzerSubmittingRefinement] = useState<boolean>(false);
 
 
   useEffect(() => {
@@ -153,23 +185,6 @@ const ImageGeneratorApp = () => {
     .filter(config => !config.isAdmin)
     .every(config => !config.isEnabledGlobal);
 
-  const [inputMode, setInputMode] = useState<InputMode>('prompt_only');
-  const [urlInput, setUrlInput] = useState('');
-  const [titleInput, setTitleInput] = useState('');
-  const [promptForTitleInput, setPromptForTitleInput] = useState('');
-  const [singlePromptInput, setSinglePromptInput] = useState('');
-  
-  const [displayList, setDisplayList] = useState<DisplayItem[]>([]);
-  const [processingJobs, setProcessingJobs] = useState<PromptJob[]>([]);
-  const [selectedStyleValue, setSelectedStyleValue] = useState<string>(artStyles[0].value);
-  
-  const [isBatchProcessing, setIsBatchProcessing] = useState(false);
-  const [currentJobIndexInQueue, setCurrentJobIndexInQueue] = useState<number | null>(null);
-  const [isDownloadingIndividual, setIsDownloadingIndividual] = useState(false);
-
-  const [itemBeingRefined, setItemBeingRefined] = useState<PromptJob | null>(null);
-  const [refinementPromptText, setRefinementPromptText] = useState<string>('');
-  const [isSubmittingRefinement, setIsSubmittingRefinement] = useState<boolean>(false);
 
   useEffect(() => {
     const initGoogleDriveApi = async () => {
@@ -249,7 +264,7 @@ const ImageGeneratorApp = () => {
     return new Blob([ab], { type: mimeString });
   };
 
-  const handleUploadToDrive = async (item: PromptJob) => {
+  const handleUploadToDrive = async (item: PromptJob, forAnalyzerTab: boolean = false) => {
     if (!item.imageUrl) {
       toast({ title: "Error", description: "No hay imagen para subir.", variant: "destructive" });
       return;
@@ -259,7 +274,12 @@ const ImageGeneratorApp = () => {
       if (!authenticated) return;
     }
 
-    setUploadingToDriveItemId(item.id);
+    if (forAnalyzerTab) {
+        setAnalyzerUploadingToDriveItemId(item.id);
+    } else {
+        setUploadingToDriveItemId(item.id);
+    }
+
     try {
       const gapi = window.gapi;
       if (!gapi || !gapi.client || !gapi.auth2) {
@@ -268,7 +288,7 @@ const ImageGeneratorApp = () => {
       
       const blob = dataURIToBlob(item.imageUrl);
       const sanitizedPrompt = item.originalPrompt.replace(/[^a-z0-9]/gi, '_').substring(0, 50);
-      const filename = `artbot_img_${item.artStyleUsed ? item.artStyleUsed.split(' ')[0].toLowerCase() + '_' : ''}${sanitizedPrompt || 'prompt'}_${item.id}.png`;
+      const filename = `artbot_img_${forAnalyzerTab ? 'analyzer_' : ''}${item.artStyleUsed ? item.artStyleUsed.split(' ')[0].toLowerCase() + '_' : ''}${sanitizedPrompt || 'prompt'}_${item.id}.png`;
       
       const fileMetadata = {
         name: filename,
@@ -302,7 +322,11 @@ const ImageGeneratorApp = () => {
       console.error("Error uploading to Google Drive", error);
       toast({ title: "Error de Subida", description: `No se pudo subir la imagen: ${error.message}`, variant: "destructive" });
     } finally {
-      setUploadingToDriveItemId(null);
+        if (forAnalyzerTab) {
+            setAnalyzerUploadingToDriveItemId(null);
+        } else {
+            setUploadingToDriveItemId(null);
+        }
     }
   };
 
@@ -362,18 +386,25 @@ const ImageGeneratorApp = () => {
     setAuthError('');
     setShowDirectAdminLogin(false);
 
+    // Reset main generator states
     setDisplayList([]);
     setProcessingJobs([]);
     setIsBatchProcessing(false);
     setCurrentJobIndexInQueue(null);
     setItemBeingRefined(null);
     setRefinementPromptText('');
+    setUploadingToDriveItemId(null);
 
-    setShowAdminPromptAnalyzer(false);
-    setAdminPromptAnalysisText('');
-    setExtractedAdminPrompts([]);
-    setIsAnalyzingText(false);
-    setIsAddingAdminPromptsToQueue(false);
+    // Reset analyzer tab states
+    setAnalyzerRawText('');
+    setAnalyzerExtractedPrompts([]);
+    setAnalyzerDisplayList([]);
+    setAnalyzerProcessingJobs([]);
+    setIsAnalyzerBatchProcessing(false);
+    setCurrentAnalyzerJobIndexInQueue(null);
+    setAnalyzerItemBeingRefined(null);
+    setAnalyzerRefinementPromptText('');
+    setAnalyzerUploadingToDriveItemId(null);
 
 
     if (googleDriveApiLoaded && window.gapi && window.gapi.auth2) {
@@ -420,10 +451,11 @@ const ImageGeneratorApp = () => {
     });
   };
 
-
+  // --- Batch Processing Logic for Main Generator ---
   useEffect(() => {
     if (!isBatchProcessing || currentJobIndexInQueue === null || currentJobIndexInQueue >= processingJobs.length) {
       if (isBatchProcessing && processingJobs.length > 0 && currentJobIndexInQueue !== null && currentJobIndexInQueue >= processingJobs.length) {
+         // Batch finished
       }
       if (isBatchProcessing) {
         setIsBatchProcessing(false); 
@@ -468,10 +500,59 @@ const ImageGeneratorApp = () => {
     }
   }, [currentJobIndexInQueue, processingJobs, isBatchProcessing]);
 
+  // --- Batch Processing Logic for Analyzer Tab ---
+  useEffect(() => {
+    if (!isAnalyzerBatchProcessing || currentAnalyzerJobIndexInQueue === null || currentAnalyzerJobIndexInQueue >= analyzerProcessingJobs.length) {
+      if (isAnalyzerBatchProcessing && analyzerProcessingJobs.length > 0 && currentAnalyzerJobIndexInQueue !== null && currentAnalyzerJobIndexInQueue >= analyzerProcessingJobs.length) {
+        // Analyzer Batch finished
+      }
+      if (isAnalyzerBatchProcessing) {
+          setIsAnalyzerBatchProcessing(false);
+      }
+      return;
+    }
+
+    const currentJob = analyzerProcessingJobs[currentAnalyzerJobIndexInQueue];
+    
+    if (currentJob && currentJob.status === 'pending') {
+      (async () => {
+        setAnalyzerDisplayList(prevDisplayList => prevDisplayList.map(dItem => 
+            dItem.id === currentJob.id && dItem.type === 'prompt' ? { ...dItem, status: 'processing' as const } : dItem
+        ));
+        setAnalyzerProcessingJobs(prevJobs => prevJobs.map(item => 
+            item.id === currentJob.id ? { ...item, status: 'processing' as const } : item
+        ));
+
+        try {
+          const result = await generateImageFromPrompt({ prompt: currentJob.styledPrompt });
+          const generatedImageUrl = result.imageUrl;
+
+          setAnalyzerDisplayList(prevItems => prevItems.map(item => 
+            item.id === currentJob.id && item.type === 'prompt' ? { ...item, status: 'completed' as const, imageUrl: generatedImageUrl } : item
+          ));
+          setAnalyzerProcessingJobs(prevJobs => prevJobs.map(item => 
+            item.id === currentJob.id ? { ...item, status: 'completed' as const, imageUrl: generatedImageUrl } : item
+          ));
+        } catch (err: any) {
+          setAnalyzerDisplayList(prevItems => prevItems.map(item => 
+            item.id === currentJob.id && item.type === 'prompt' ? { ...item, status: 'failed' as const, error: err.message || 'Unknown error' } : item
+          ));
+          setAnalyzerProcessingJobs(prevJobs => prevJobs.map(item => 
+            item.id === currentJob.id ? { ...item, status: 'failed' as const, error: err.message || 'Unknown error' } : item
+          ));
+        } finally {
+          setCurrentAnalyzerJobIndexInQueue(prevIndex => (prevIndex !== null ? prevIndex + 1 : 0));
+        }
+      })();
+    } else if (currentJob) { 
+        setCurrentAnalyzerJobIndexInQueue(prevIndex => (prevIndex !== null ? prevIndex + 1 : 0));
+    }
+  }, [currentAnalyzerJobIndexInQueue, analyzerProcessingJobs, isAnalyzerBatchProcessing]);
+
 
   const handleAddItemToQueue = () => {
     if (displayList.length >= MAX_PROMPTS_OVERALL) {
-      toast({ title: "Límite Alcanzado", description: `No puedes agregar más de ${MAX_PROMPTS_OVERALL} elementos en total.`, variant: "destructive" });
+      toast({ title: "Límite Alcanzado (Principal)", description: `No puedes agregar más de ${MAX_PROMPTS_OVERALL} elementos en total a esta cola.`, variant: "destructive" });
       return;
     }
 
@@ -508,7 +589,7 @@ const ImageGeneratorApp = () => {
         if (promptForTitleInput.trim()) {
            const currentAiJobsCount = processingJobs.filter(job => job.type === 'prompt').length;
             if (currentAiJobsCount >= MAX_PROCESSING_JOBS) {
-                toast({ title: "Límite de Prompts IA", description: `No puedes agregar más de ${MAX_PROCESSING_JOBS} prompts de IA a la cola para procesar.`, variant: "destructive" });
+                toast({ title: "Límite de Prompts IA (Principal)", description: `No puedes agregar más de ${MAX_PROCESSING_JOBS} prompts de IA a la cola para procesar.`, variant: "destructive" });
                 return; 
             }
           const styledPrompt = `${promptForTitleInput.trim()}${currentArtStyle.promptSuffix}`;
@@ -530,7 +611,7 @@ const ImageGeneratorApp = () => {
         }
         const currentAiJobsCount = processingJobs.filter(j => j.type === 'prompt').length;
         if (currentAiJobsCount >= MAX_PROCESSING_JOBS) {
-            toast({ title: "Límite de Prompts IA", description: `No puedes agregar más de ${MAX_PROCESSING_JOBS} prompts de IA a la cola para procesar.`, variant: "destructive" });
+            toast({ title: "Límite de Prompts IA (Principal)", description: `No puedes agregar más de ${MAX_PROCESSING_JOBS} prompts de IA a la cola para procesar.`, variant: "destructive" });
             return;
         }
         const styledPrompt = `${singlePromptInput.trim()}${currentArtStyle.promptSuffix}`;
@@ -561,7 +642,7 @@ const ImageGeneratorApp = () => {
   const handleStartBatchProcessing = () => {
     const pendingJobs = processingJobs.filter(job => job.status === 'pending');
     if (pendingJobs.length === 0) {
-      toast({ title: "Cola Vacía", description: "No hay prompts de IA pendientes en la cola para procesar.", variant: "destructive"});
+      toast({ title: "Cola Principal Vacía", description: "No hay prompts de IA pendientes en la cola principal para procesar.", variant: "destructive"});
       return;
     }
     setIsBatchProcessing(true);
@@ -571,33 +652,38 @@ const ImageGeneratorApp = () => {
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-  const handleDownloadAllImages = async () => {
-    const imagesToDownload = displayList.filter(
+  const downloadFile = (href: string, filename: string) => {
+    const link = document.createElement('a');
+    link.href = href;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
+  const handleDownloadAllImages = async (forAnalyzerTab: boolean = false) => {
+    const targetDisplayList = forAnalyzerTab ? analyzerDisplayList : displayList;
+    const setIsDownloading = forAnalyzerTab ? setIsAnalyzerDownloadingIndividual : setIsDownloadingIndividual;
+    const tabName = forAnalyzerTab ? "Analizador" : "Principal";
+
+    const imagesToDownload = targetDisplayList.filter(
         (item): item is PromptJob => item.type === 'prompt' && item.status === 'completed' && !!item.imageUrl && item.imageUrl.startsWith('data:image')
     );
 
     if (imagesToDownload.length === 0) {
-        toast({ title: "Sin Imágenes", description: "No hay imágenes generadas por IA con éxito para descargar.", variant: "destructive" });
+        toast({ title: `Sin Imágenes (${tabName})`, description: "No hay imágenes generadas por IA con éxito para descargar.", variant: "destructive" });
         return;
     }
 
-    setIsDownloadingIndividual(true);
+    setIsDownloading(true);
     let downloadedCount = 0;
 
     for (let i = 0; i < imagesToDownload.length; i++) {
         const item = imagesToDownload[i];
         try {
-            const link = document.createElement('a');
-            link.href = item.imageUrl!; 
-            
             const sanitizedPrompt = item.originalPrompt.replace(/[^a-z0-9]/gi, '_').substring(0, 30);
-            const filename = `artbot_img_${i + 1}_${item.artStyleUsed ? item.artStyleUsed.split(' ')[0].toLowerCase() + '_' : ''}${sanitizedPrompt || 'prompt'}.png`;
-            link.download = filename;
-            
-            document.body.appendChild(link); 
-            link.click();
-            document.body.removeChild(link);
-            
+            const filename = `artbot_img_${forAnalyzerTab ? 'analyzer_' : ''}${i + 1}_${item.artStyleUsed ? item.artStyleUsed.split(' ')[0].toLowerCase() + '_' : ''}${sanitizedPrompt || 'prompt'}.png`;
+            downloadFile(item.imageUrl!, filename);
             downloadedCount++;
             if (i < imagesToDownload.length - 1) { 
                 await delay(DOWNLOAD_DELAY_MS);
@@ -608,68 +694,138 @@ const ImageGeneratorApp = () => {
         }
     }
     
-    toast({ title: "Descarga Iniciada", description: `${downloadedCount} imagen(es) generada(s) por IA programada(s) para descarga.` });
-    setIsDownloadingIndividual(false);
+    toast({ title: `Descarga Iniciada (${tabName})`, description: `${downloadedCount} imagen(es) generada(s) por IA programada(s) para descarga.` });
+    setIsDownloading(false);
   };
 
-  const handleStartRefinement = (item: PromptJob) => {
-    if (isBatchProcessing || isDownloadingIndividual || isSubmittingRefinement || uploadingToDriveItemId) return;
-    setItemBeingRefined(item);
-    setRefinementPromptText('');
+  const handleDownloadAllImagesAsZip = async (forAnalyzerTab: boolean = false) => {
+    const targetDisplayList = forAnalyzerTab ? analyzerDisplayList : displayList;
+    const setIsDownloading = forAnalyzerTab ? setIsAnalyzerDownloadingZip : setIsDownloadingZip;
+    const tabName = forAnalyzerTab ? "Analizador" : "Principal";
+
+    const imagesToDownload = targetDisplayList.filter(
+        (item): item is PromptJob => item.type === 'prompt' && item.status === 'completed' && !!item.imageUrl && item.imageUrl.startsWith('data:image')
+    );
+
+    if (imagesToDownload.length === 0) {
+        toast({ title: `Sin Imágenes (${tabName})`, description: "No hay imágenes generadas por IA con éxito para descargar en ZIP.", variant: "destructive" });
+        return;
+    }
+
+    setIsDownloading(true);
+    const zip = new JSZip();
+    let filesAddedToZip = 0;
+
+    for (let i = 0; i < imagesToDownload.length; i++) {
+        const item = imagesToDownload[i];
+        try {
+            const blob = dataURIToBlob(item.imageUrl!);
+            const sanitizedPrompt = item.originalPrompt.replace(/[^a-z0-9]/gi, '_').substring(0, 30);
+            const filename = `artbot_img_${forAnalyzerTab ? 'analyzer_' : ''}${i + 1}_${item.artStyleUsed ? item.artStyleUsed.split(' ')[0].toLowerCase() + '_' : ''}${sanitizedPrompt || 'prompt'}.png`;
+            zip.file(filename, blob);
+            filesAddedToZip++;
+        } catch (error) {
+            console.error(`Error al agregar imagen al ZIP para el prompt "${item.originalPrompt}": `, error);
+            toast({ title: "Error al Comprimir", description: `Error al agregar imagen al ZIP: "${item.originalPrompt.substring(0,50)}..."`, variant: "destructive" });
+        }
+    }
+
+    if (filesAddedToZip > 0) {
+        try {
+            const zipBlob = await zip.generateAsync({ type: "blob" });
+            const zipFilename = `ArtBot_Images_${tabName}_${new Date().toISOString().split('T')[0]}.zip`;
+            downloadFile(URL.createObjectURL(zipBlob), zipFilename);
+            toast({ title: `Descarga ZIP Iniciada (${tabName})`, description: `${filesAddedToZip} imágenes agregadas al archivo ZIP.` });
+        } catch (error) {
+            console.error("Error generando el archivo ZIP: ", error);
+            toast({ title: "Error al Generar ZIP", description: "No se pudo generar el archivo ZIP.", variant: "destructive" });
+        }
+    } else {
+        toast({ title: `Sin Imágenes para ZIP (${tabName})`, description: "No se pudieron agregar imágenes al archivo ZIP.", variant: "default" });
+    }
+    setIsDownloading(false);
   };
 
-  const handleCancelRefinement = () => {
-    setItemBeingRefined(null);
-    setRefinementPromptText('');
+
+  const handleStartRefinement = (item: PromptJob, forAnalyzerTab: boolean = false) => {
+    if (forAnalyzerTab) {
+        if (isAnalyzerBatchProcessing || isAnalyzerDownloadingIndividual || isAnalyzerDownloadingZip || isAnalyzerSubmittingRefinement || analyzerUploadingToDriveItemId) return;
+        setAnalyzerItemBeingRefined(item);
+        setAnalyzerRefinementPromptText('');
+    } else {
+        if (isBatchProcessing || isDownloadingIndividual || isDownloadingZip || isSubmittingRefinement || uploadingToDriveItemId) return;
+        setItemBeingRefined(item);
+        setRefinementPromptText('');
+    }
   };
 
-  const handleSubmitRefinement = async () => {
-    if (!itemBeingRefined || !refinementPromptText.trim() || !itemBeingRefined.imageUrl) {
-      toast({ title: "Error", description: "Se necesita la imagen original y un prompt de mejora.", variant: "destructive" });
+  const handleCancelRefinement = (forAnalyzerTab: boolean = false) => {
+    if (forAnalyzerTab) {
+        setAnalyzerItemBeingRefined(null);
+        setAnalyzerRefinementPromptText('');
+    } else {
+        setItemBeingRefined(null);
+        setRefinementPromptText('');
+    }
+  };
+
+  const handleSubmitRefinement = async (forAnalyzerTab: boolean = false) => {
+    const currentItemBeingRefined = forAnalyzerTab ? analyzerItemBeingRefined : itemBeingRefined;
+    const currentRefinementText = forAnalyzerTab ? analyzerRefinementPromptText : refinementPromptText;
+    const setIsCurrentlySubmitting = forAnalyzerTab ? setIsAnalyzerSubmittingRefinement : setIsSubmittingRefinement;
+    const setTargetDisplayList = forAnalyzerTab ? setAnalyzerDisplayList : setDisplayList;
+    const setTargetProcessingJobs = forAnalyzerTab ? setAnalyzerProcessingJobs : setProcessingJobs;
+    const setTargetItemBeingRefined = forAnalyzerTab ? setAnalyzerItemBeingRefined : setItemBeingRefined;
+    const setTargetRefinementPromptText = forAnalyzerTab ? setAnalyzerRefinementPromptText : setRefinementPromptText;
+    const tabName = forAnalyzerTab ? "Analizador" : "Principal";
+
+    if (!currentItemBeingRefined || !currentRefinementText.trim() || !currentItemBeingRefined.imageUrl) {
+      toast({ title: `Error (${tabName})`, description: "Se necesita la imagen original y un prompt de mejora.", variant: "destructive" });
       return;
     }
     
-    setIsSubmittingRefinement(true);
-    const originalImageUri = itemBeingRefined.imageUrl;
-    const itemIdToRefine = itemBeingRefined.id;
+    setIsCurrentlySubmitting(true);
+    const originalImageUri = currentItemBeingRefined.imageUrl;
+    const itemIdToRefine = currentItemBeingRefined.id;
 
     const updateItemState = (id: number, updates: Partial<PromptJob>) => {
-      setDisplayList(prev => prev.map(dItem => dItem.id === id && dItem.type === 'prompt' ? { ...dItem, ...updates } as PromptJob : dItem));
-      setProcessingJobs(prev => prev.map(pJob => pJob.id === id && pJob.type === 'prompt' ? { ...pJob, ...updates } as PromptJob : pJob));
+      setTargetDisplayList(prev => prev.map(dItem => dItem.id === id && dItem.type === 'prompt' ? { ...dItem, ...updates } as PromptJob : dItem));
+      setTargetProcessingJobs(prev => prev.map(pJob => pJob.id === id && pJob.type === 'prompt' ? { ...pJob, ...updates } as PromptJob : pJob));
     };
 
     updateItemState(itemIdToRefine, { status: 'refining' });
 
     try {
-      const result = await refineImage({ originalImageUri, refinementPrompt: refinementPromptText });
+      const result = await refineImage({ originalImageUri, refinementPrompt: currentRefinementText });
       const refinedImageUri = result.refinedImageUri;
       updateItemState(itemIdToRefine, { 
         imageUrl: refinedImageUri, 
         status: 'completed', 
       });
-      toast({ title: "Éxito", description: "Imagen mejorada con éxito." });
+      toast({ title: `Éxito (${tabName})`, description: "Imagen mejorada con éxito." });
     } catch (err: any) {
       const errMessage = err.message || 'Error desconocido durante la mejora.';
       updateItemState(itemIdToRefine, { status: 'completed', error: `Mejora fallida: ${errMessage}` }); 
-      toast({ title: "Error de Mejora", description: errMessage, variant: "destructive" });
+      toast({ title: `Error de Mejora (${tabName})`, description: errMessage, variant: "destructive" });
     } finally {
-      setItemBeingRefined(null);
-      setRefinementPromptText('');
-      setIsSubmittingRefinement(false);
+      setTargetItemBeingRefined(null);
+      setTargetRefinementPromptText('');
+      setIsCurrentlySubmitting(false);
     }
   };
 
+  // --- Analyzer Tab Specific Logic ---
   const handleAnalyzeTextForPrompts = async () => {
-    if (!adminPromptAnalysisText.trim()) {
+    if (!analyzerRawText.trim()) {
       toast({ title: "Texto Vacío", description: "Por favor, ingresa texto para analizar.", variant: "destructive" });
       return;
     }
     setIsAnalyzingText(true);
-    setExtractedAdminPrompts([]);
+    setAnalyzerExtractedPrompts([]);
     try {
-      const result = await extractPromptsFromText({ textBlock: adminPromptAnalysisText });
+      const result = await extractPromptsFromText({ textBlock: analyzerRawText });
       if (result.prompts && result.prompts.length > 0) {
-        setExtractedAdminPrompts(result.prompts);
+        setAnalyzerExtractedPrompts(result.prompts);
         toast({ title: "Análisis Completo", description: `${result.prompts.length} prompts detectados.` });
       } else {
         toast({ title: "Sin Prompts", description: "No se detectaron prompts claros en el texto.", variant: "default" });
@@ -682,28 +838,28 @@ const ImageGeneratorApp = () => {
     }
   };
 
-  const handleAddAdminPromptsToQueue = () => {
-    if (extractedAdminPrompts.length === 0) return;
+  const handleAddExtractedPromptsToAnalyzerQueue = () => {
+    if (analyzerExtractedPrompts.length === 0) return;
 
-    setIsAddingAdminPromptsToQueue(true);
+    setIsAddingExtractedToAnalyzerQueue(true);
     let promptsAdded = 0;
-    const currentArtStyle = artStyles.find(style => style.value === selectedStyleValue) || artStyles[0];
+    const currentArtStyle = artStyles.find(style => style.value === analyzerSelectedStyleValue) || artStyles[0];
 
     const newDisplayItemsBatch: DisplayItem[] = [];
     const newProcessingJobsBatch: PromptJob[] = [];
 
-    for (const promptText of extractedAdminPrompts) {
-      if (displayList.length + newDisplayItemsBatch.length >= MAX_PROMPTS_OVERALL) {
-        toast({ title: "Límite General Alcanzado", description: `No se pueden agregar más de ${MAX_PROMPTS_OVERALL} elementos. ${promptsAdded} prompts fueron agregados.`, variant: "destructive", duration: 7000 });
+    for (const promptText of analyzerExtractedPrompts) {
+      if (analyzerDisplayList.length + newDisplayItemsBatch.length >= MAX_PROMPTS_OVERALL) {
+        toast({ title: "Límite General Alcanzado (Analizador)", description: `No se pueden agregar más de ${MAX_PROMPTS_OVERALL} elementos. ${promptsAdded} prompts fueron agregados.`, variant: "destructive", duration: 7000 });
         break;
       }
-      const currentAiJobsInQueue = processingJobs.filter(j => j.type === 'prompt').length + newProcessingJobsBatch.length;
-      if (currentAiJobsInQueue >= MAX_PROCESSING_JOBS) {
-        toast({ title: "Límite de Prompts IA Alcanzado", description: `No se pueden agregar más de ${MAX_PROCESSING_JOBS} prompts de IA. ${promptsAdded} prompts fueron agregados.`, variant: "destructive", duration: 7000 });
+      const currentAiJobsInAnalyzerQueue = analyzerProcessingJobs.filter(j => j.type === 'prompt').length + newProcessingJobsBatch.length;
+      if (currentAiJobsInAnalyzerQueue >= MAX_PROCESSING_JOBS) {
+        toast({ title: "Límite de Prompts IA Alcanzado (Analizador)", description: `No se pueden agregar más de ${MAX_PROCESSING_JOBS} prompts de IA. ${promptsAdded} prompts fueron agregados.`, variant: "destructive", duration: 7000 });
         break;
       }
 
-      const uniqueId = Date.now() + displayList.length + newDisplayItemsBatch.length + Math.random();
+      const uniqueId = Date.now() + analyzerDisplayList.length + newDisplayItemsBatch.length + Math.random();
       const styledPrompt = `${promptText.trim()}${currentArtStyle.promptSuffix}`;
       const newJob: PromptJob = {
         id: uniqueId,
@@ -721,34 +877,49 @@ const ImageGeneratorApp = () => {
     }
 
     if (newDisplayItemsBatch.length > 0) {
-      setDisplayList(prev => [...prev, ...newDisplayItemsBatch]);
+      setAnalyzerDisplayList(prev => [...prev, ...newDisplayItemsBatch]);
     }
     if (newProcessingJobsBatch.length > 0) {
-      setProcessingJobs(prev => [...prev, ...newProcessingJobsBatch]);
+      setAnalyzerProcessingJobs(prev => [...prev, ...newProcessingJobsBatch]);
     }
     
-    toast({ title: "Prompts Agregados", description: `${promptsAdded} prompts han sido añadidos a la cola principal.` });
-
-    setExtractedAdminPrompts([]);
-    // setAdminPromptAnalysisText(''); // Decidido mantener el texto por si el usuario quiere refinar el análisis.
-    setIsAddingAdminPromptsToQueue(false);
+    toast({ title: "Prompts Agregados (Analizador)", description: `${promptsAdded} prompts han sido añadidos a la cola del analizador.` });
     
-    // Opcional: si no se está procesando, iniciar
-    // const totalPending = processingJobs.filter(j => j.status === 'pending').length + newProcessingJobsBatch.filter(j => j.status === 'pending').length;
-    // if (!isBatchProcessing && totalPending > 0 && (currentJobIndexInQueue === null || currentJobIndexInQueue >= (processingJobs.length - newProcessingJobsBatch.length))) {
-    //    handleStartBatchProcessing();
-    // }
+    // Do not clear extracted prompts or raw text automatically
+    // setAnalyzerExtractedPrompts([]);
+    // setAnalyzerRawText('');
+    setIsAddingExtractedToAnalyzerQueue(false);
+  };
+  
+  const handleAnalyzerStartBatchProcessing = () => {
+    const pendingJobs = analyzerProcessingJobs.filter(job => job.status === 'pending');
+    if (pendingJobs.length === 0) {
+      toast({ title: "Cola del Analizador Vacía", description: "No hay prompts de IA pendientes para procesar.", variant: "destructive"});
+      return;
+    }
+    setIsAnalyzerBatchProcessing(true);
+    setCurrentAnalyzerJobIndexInQueue(0); 
+    setAnalyzerItemBeingRefined(null); 
   };
 
 
+  // --- Helper functions for UI state ---
   const currentProcessingPromptJob = () => {
     if (isBatchProcessing && currentJobIndexInQueue !== null && currentJobIndexInQueue < processingJobs.length) {
       return processingJobs[currentJobIndexInQueue];
     }
     return null;
   };
+  const currentAnalyzerProcessingPromptJob = () => {
+    if (isAnalyzerBatchProcessing && currentAnalyzerJobIndexInQueue !== null && currentAnalyzerJobIndexInQueue < analyzerProcessingJobs.length) {
+      return analyzerProcessingJobs[currentAnalyzerJobIndexInQueue];
+    }
+    return null;
+  };
   
   const canDownloadGenerated = !isBatchProcessing && displayList.some(item => item.type === 'prompt' && item.status === 'completed' && item.imageUrl && item.imageUrl.startsWith('data:image'));
+  const canAnalyzerDownloadGenerated = !isAnalyzerBatchProcessing && analyzerDisplayList.some(item => item.type === 'prompt' && item.status === 'completed' && item.imageUrl && item.imageUrl.startsWith('data:image'));
+
 
   const isInputEmpty = () => {
     switch (inputMode) {
@@ -764,12 +935,19 @@ const ImageGeneratorApp = () => {
   };
   
   const pendingAiJobsCount = processingJobs.filter(j => j.status === 'pending').length;
-  const canStartBatch = !isBatchProcessing && pendingAiJobsCount > 0 && !isDownloadingIndividual && !itemBeingRefined && !uploadingToDriveItemId;
+  const analyzerPendingAiJobsCount = analyzerProcessingJobs.filter(j => j.status === 'pending').length;
+
+  const canStartBatch = !isBatchProcessing && pendingAiJobsCount > 0 && !isDownloadingIndividual && !isDownloadingZip && !itemBeingRefined && !uploadingToDriveItemId;
+  const canAnalyzerStartBatch = !isAnalyzerBatchProcessing && analyzerPendingAiJobsCount > 0 && !isAnalyzerDownloadingIndividual && !isAnalyzerDownloadingZip && !analyzerItemBeingRefined && !analyzerUploadingToDriveItemId;
+  
   const aiJobsInQueueCount = processingJobs.filter(j => j.type === 'prompt').length;
+  const analyzerAiJobsInQueueCount = analyzerProcessingJobs.filter(j => j.type === 'prompt').length;
+
 
   const canAddItem = !isBatchProcessing && 
                      !isInputEmpty() && 
                      !isDownloadingIndividual && 
+                     !isDownloadingZip &&
                      !itemBeingRefined &&
                      !uploadingToDriveItemId &&
                      displayList.length < MAX_PROMPTS_OVERALL &&
@@ -786,6 +964,132 @@ const ImageGeneratorApp = () => {
     currentGreeting = "Modo de Acceso Abierto. Funcionalidad completa disponible.";
   }
 
+
+  const renderQueueItem = (item: DisplayItem, index: number, forAnalyzerTab: boolean) => {
+    const currentItemBeingRefinedState = forAnalyzerTab ? analyzerItemBeingRefined : itemBeingRefined;
+    const currentRefinementTextState = forAnalyzerTab ? analyzerRefinementPromptText : refinementPromptText;
+    const setRefinementTextState = forAnalyzerTab ? setAnalyzerRefinementPromptText : setRefinementPromptText;
+    const isCurrentlySubmittingRefinement = forAnalyzerTab ? isAnalyzerSubmittingRefinement : isSubmittingRefinement;
+    const currentUploadingToDriveItemId = forAnalyzerTab ? analyzerUploadingToDriveItemId : uploadingToDriveItemId;
+    const currentIsBatchProcessing = forAnalyzerTab ? isAnalyzerBatchProcessing : isBatchProcessing;
+    const currentIsDownloading = forAnalyzerTab ? (isAnalyzerDownloadingIndividual || isAnalyzerDownloadingZip) : (isDownloadingIndividual || isDownloadingZip);
+
+    return (
+        <div key={item.id} className="p-4 rounded-lg bg-card/75 border border-primary/70 shadow-md relative">
+            <span className="absolute top-2 right-2 text-xs bg-primary/20 text-primary font-bold px-2 py-1 rounded-full">#{index + 1}</span>
+            {item.type === 'title_comment' && ( 
+            <div className="flex items-center">
+                <Type size={20} className="mr-3 text-primary flex-shrink-0" />
+                <p className="font-semibold text-md text-primary">{item.text}</p>
+            </div>
+            )}
+            {item.type === 'external_image' && (
+            <div>
+                <p className="font-semibold text-sm text-green-600 mb-1 flex items-center">
+                <LinkIcon size={18} className="inline mr-2 align-text-bottom" />
+                Imagen Externa: <span className="text-muted-foreground font-normal ml-1 truncate w-60" title={item.imageUrl}>{item.imageUrl}</span>
+                </p>
+                <div className="mt-3 p-1 border-2 border-dashed border-green-500/60 rounded-md bg-background/40">
+                    <img 
+                    src={item.imageUrl} 
+                    alt={`Imagen externa de ${item.imageUrl}`} 
+                    className="w-full h-auto rounded object-contain max-h-[40vh]"
+                    data-ai-hint="external content"
+                    onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                        const target = e.target as HTMLImageElement;
+                        target.onerror = null; 
+                        const parent = target.parentElement;
+                        if (parent) {
+                        parent.innerHTML = `<div class="text-red-500 p-2">Error al cargar imagen externa. Verifique que la URL sea pública y correcta.</div>`;
+                        }
+                    }}
+                    />
+                </div>
+            </div>
+            )}
+            {item.type === 'skipped_prompt' && (
+            <div>
+                <p className="font-semibold text-sm text-yellow-500 mb-1">Entrada Omitida: <span className="text-muted-foreground font-normal">{item.text}</span></p>
+                <p className="text-xs text-yellow-600">{item.reason}</p>
+            </div>
+            )}
+            {item.type === 'prompt' && (
+            <div>
+                <p className="font-semibold text-sm text-accent mb-1">
+                <MessageSquareText size={18} className="inline mr-2 align-text-bottom" />
+                Prompt IA ({item.artStyleUsed || 'Estilo no especificado'}): <span className="text-foreground font-normal">{item.originalPrompt}</span>
+                </p>
+                {item.status === 'pending' && <p className="text-sm text-yellow-500 flex items-center mt-2"><Info size={16} className="mr-1"/> Pendiente IA...</p>}
+                {item.status === 'processing' && <p className="text-sm text-blue-500 flex items-center mt-2"><Loader2 size={16} className="mr-1 animate-spin"/> Procesando IA...</p>}
+                {item.status === 'refining' && <p className="text-sm text-purple-500 flex items-center mt-2"><Loader2 size={16} className="mr-1 animate-spin"/> Mejorando imagen IA...</p>}
+                {item.status === 'failed' && item.error && (
+                <div className="text-sm text-destructive-foreground p-2 bg-destructive/90 rounded mt-2">
+                    <AlertTriangle size={16} className="inline mr-1" /> Error IA: {item.error}
+                </div>
+                )}
+                {item.status === 'completed' && item.imageUrl && (
+                <>
+                    <div className="mt-3 p-1 border-2 border-dashed border-primary/60 rounded-md bg-background/40">
+                    <img src={item.imageUrl} alt={`Generado por IA para: ${item.originalPrompt} (${item.artStyleUsed})`} className="w-full h-auto rounded object-contain max-h-[40vh]" data-ai-hint="generated art" />
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                    {!currentItemBeingRefinedState && !currentIsBatchProcessing && !currentIsDownloading && !currentUploadingToDriveItemId &&(
+                        <Button onClick={() => handleStartRefinement(item, forAnalyzerTab)} size="sm" variant="outline" className="mt-3 border-accent text-accent hover:bg-accent/10">
+                        <Wand2 className="mr-2 h-4 w-4" /> Mejorar Imagen
+                        </Button>
+                    )}
+                    {!currentIsBatchProcessing && !currentIsDownloading && !currentItemBeingRefinedState && (
+                        <Button
+                            onClick={() => handleUploadToDrive(item, forAnalyzerTab)}
+                            disabled={currentUploadingToDriveItemId === item.id || !googleDriveApiLoaded || !process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
+                            size="sm"
+                            variant="outline"
+                            className="mt-3 border-blue-500 text-blue-500 hover:text-blue-700 hover:bg-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+                            title={!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? "Google Client ID no configurado" : (isGoogleDriveAuthenticated ? "Subir a Google Drive" : "Autenticar con Google Drive para subir")}
+                        >
+                            {currentUploadingToDriveItemId === item.id ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                            <UploadCloud className="mr-2 h-4 w-4" />
+                            )}
+                            {isGoogleDriveAuthenticated ? 'Subir a Drive' : 'Autenticar y Subir'}
+                        </Button>
+                    )}
+                    </div>
+                    {!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && googleDriveApiLoaded === false && (
+                        <p className="text-xs text-yellow-600 mt-1">La subida a Google Drive está deshabilitada porque Google Client ID no está configurado en las variables de entorno.</p>
+                    )}
+                </>
+                )}
+                {currentItemBeingRefinedState?.id === item.id && (
+                <div className="mt-4 p-3 border border-dashed border-accent/70 rounded-lg bg-card/50">
+                    <Label htmlFor={`refine-${item.id}-${forAnalyzerTab}`} className="text-sm font-medium text-accent flex items-center mb-2">
+                    <Wand2 size={16} className="mr-2"/> Prompt de Mejora:
+                    </Label>
+                    <Textarea
+                    id={`refine-${item.id}-${forAnalyzerTab}`}
+                    value={currentRefinementTextState}
+                    onChange={(e) => setRefinementTextState(e.target.value)}
+                    placeholder="Ej: hacerlo más oscuro, añadir un gato, cambiar el color del cielo..."
+                    rows={2}
+                    className="my-2 bg-background/70 border-accent/50 focus-visible:border-accent"
+                    disabled={isCurrentlySubmittingRefinement}
+                    />
+                    <div className="flex gap-2 mt-2">
+                    <Button onClick={() => handleSubmitRefinement(forAnalyzerTab)} size="sm" disabled={isCurrentlySubmittingRefinement || !currentRefinementTextState.trim()} className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                        {isCurrentlySubmittingRefinement ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : <Send className="mr-2 h-4 w-4" />} Aplicar Mejora
+                    </Button>
+                    <Button onClick={() => handleCancelRefinement(forAnalyzerTab)} size="sm" variant="ghost" disabled={isCurrentlySubmittingRefinement}>
+                        Cancelar
+                    </Button>
+                    </div>
+                </div>
+                )}
+            </div>
+            )}
+        </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-4 font-body relative overflow-hidden">
@@ -923,347 +1227,309 @@ const ImageGeneratorApp = () => {
               </div>
               <CardDescription className="text-muted-foreground text-sm md:text-base">
                 Agrega URLs, títulos o prompts a la cola. Selecciona un estilo y procesa en lote para generar arte con IA.
-                Puedes añadir hasta {MAX_PROMPTS_OVERALL} elementos en total, con un máximo de {MAX_PROCESSING_JOBS} prompts de IA por lote.
+                Puedes añadir hasta {MAX_PROMPTS_OVERALL} elementos por cola, con un máximo de {MAX_PROCESSING_JOBS} prompts de IA por lote.
               </CardDescription>
             </CardHeader>
 
             <CardContent>
-              <main>
-                <div className="mb-6">
-                  <Label className="block mb-3 text-sm font-medium text-accent">Elige el tipo de entrada:</Label>
-                  <RadioGroup
-                    value={inputMode}
-                    onValueChange={(value: string) => setInputMode(value as InputMode)}
-                    className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0 mb-4"
-                    disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined || !!uploadingToDriveItemId}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="url" id="mode_url" />
-                      <Label htmlFor="mode_url" className="flex items-center cursor-pointer"><LinkIcon size={16} className="mr-2 text-primary"/> URL de Imagen</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="title_prompt" id="mode_title_prompt" />
-                      <Label htmlFor="mode_title_prompt" className="flex items-center cursor-pointer"><Type size={16} className="mr-2 text-primary"/> Título + Prompt</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="prompt_only" id="mode_prompt_only" />
-                      <Label htmlFor="mode_prompt_only" className="flex items-center cursor-pointer"><MessageSquareText size={16} className="mr-2 text-primary"/> Solo Prompt</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
+             <Tabs defaultValue="generator" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                    <TabsTrigger value="generator">Generador Principal</TabsTrigger>
+                    <TabsTrigger value="analyzer">Análisis Avanzado</TabsTrigger>
+                </TabsList>
 
-                {inputMode === 'url' && (
-                  <div className="mb-6">
-                    <Label htmlFor="urlInput" className="block mb-2 text-sm font-medium text-accent">
-                      URL de la Imagen:
-                    </Label>
-                    <Input
-                      id="urlInput"
-                      type="url"
-                      className="w-full p-3 bg-background/70 border-primary border-2 rounded-lg focus-visible:ring-accent focus-visible:border-accent transition-all duration-300 ease-in-out placeholder:text-muted-foreground"
-                      placeholder="https://ejemplo.com/imagen.png"
-                      value={urlInput}
-                      onChange={(e) => setUrlInput(e.target.value)}
-                      disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined || !!uploadingToDriveItemId}
-                    />
-                  </div>
-                )}
-
-                {inputMode === 'title_prompt' && (
-                  <>
-                    <div className="mb-6">
-                      <Label htmlFor="titleInput" className="block mb-2 text-sm font-medium text-accent">
-                        Título (opcional, se añade como comentario):
-                      </Label>
-                      <Input
-                        id="titleInput"
-                        type="text"
-                        className="w-full p-3 bg-background/70 border-primary border-2 rounded-lg focus-visible:ring-accent focus-visible:border-accent transition-all duration-300 ease-in-out placeholder:text-muted-foreground"
-                        placeholder="Mi increíble título"
-                        value={titleInput}
-                        onChange={(e) => setTitleInput(e.target.value)}
-                        disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined || !!uploadingToDriveItemId}
-                      />
-                    </div>
-                    <div className="mb-6">
-                      <Label htmlFor="promptForTitleInput" className="block mb-2 text-sm font-medium text-accent">
-                        Prompt para IA (opcional si solo quieres añadir título):
-                      </Label>
-                      <Textarea
-                        id="promptForTitleInput"
-                        rows={3}
-                        className="w-full p-3 bg-background/70 border-primary border-2 rounded-lg focus-visible:ring-accent focus-visible:border-accent transition-all duration-300 ease-in-out placeholder:text-muted-foreground resize-y"
-                        placeholder="Descripción detallada para la IA..."
-                        value={promptForTitleInput}
-                        onChange={(e) => setPromptForTitleInput(e.target.value)}
-                        disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined || !!uploadingToDriveItemId || (aiJobsInQueueCount >= MAX_PROCESSING_JOBS && promptForTitleInput.length > 0)}
-                      />
-                       {aiJobsInQueueCount >= MAX_PROCESSING_JOBS && <p className="text-xs text-yellow-600 mt-1">Límite de prompts de IA ({MAX_PROCESSING_JOBS}) alcanzado para este lote.</p>}
-                    </div>
-                  </>
-                )}
-
-                {inputMode === 'prompt_only' && (
-                  <div className="mb-6">
-                    <Label htmlFor="singlePromptInput" className="block mb-2 text-sm font-medium text-accent">
-                      Tu Prompt para IA:
-                    </Label>
-                    <Textarea
-                      id="singlePromptInput"
-                      rows={5}
-                      className="w-full p-3 bg-background/70 border-primary border-2 rounded-lg focus-visible:ring-accent focus-visible:border-accent transition-all duration-300 ease-in-out placeholder:text-muted-foreground resize-y"
-                      placeholder="Un gato cibernético en una ciudad lluviosa de neón..."
-                      value={singlePromptInput}
-                      onChange={(e) => setSinglePromptInput(e.target.value)}
-                      disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined || !!uploadingToDriveItemId || (aiJobsInQueueCount >= MAX_PROCESSING_JOBS && singlePromptInput.length > 0)}
-                    />
-                    {aiJobsInQueueCount >= MAX_PROCESSING_JOBS && <p className="text-xs text-yellow-600 mt-1">Límite de prompts de IA ({MAX_PROCESSING_JOBS}) alcanzado para este lote.</p>}
-                  </div>
-                )}
-
-                <div className="mb-6">
-                  <Label htmlFor="artStyle" className="block mb-2 text-sm font-medium text-accent flex items-center">
-                    <Palette size={18} className="mr-2"/> Estilo de Arte (para prompts de IA):
-                  </Label>
-                  <Select 
-                    value={selectedStyleValue} 
-                    onValueChange={setSelectedStyleValue}
-                    disabled={isBatchProcessing || isDownloadingIndividual || !!itemBeingRefined || !!uploadingToDriveItemId}
-                  >
-                    <SelectTrigger 
-                      id="artStyle"
-                      className="w-full bg-background/70 border-primary border-2 rounded-lg focus:ring-accent focus:border-accent transition-all duration-300 ease-in-out"
-                    >
-                      <SelectValue placeholder="Selecciona un estilo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {artStyles.map(style => (
-                        <SelectItem key={style.value} value={style.value}>{style.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="mb-6">
-                    <Button
-                        onClick={handleAddItemToQueue}
-                        disabled={!canAddItem}
-                        className="w-full text-white font-semibold py-3 px-4 text-lg bg-primary hover:bg-primary/90 focus:ring-4 focus:ring-primary/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
-                    >
-                        <PlusCircle className="w-6 h-6 mr-2" /> Agregar a la Cola ({displayList.length}/{MAX_PROMPTS_OVERALL} total, {aiJobsInQueueCount}/{MAX_PROCESSING_JOBS} IA)
-                    </Button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  <Button
-                    onClick={handleStartBatchProcessing}
-                    disabled={!canStartBatch}
-                    className="w-full text-white font-semibold py-3 px-4 text-lg focus:ring-4 focus:ring-accent/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:bg-accent/90 bg-accent"
-                  >
-                    {isBatchProcessing ? <><Loader2 className="w-6 h-6 mr-2 animate-spin" /> Procesando Lote...</> : <><PlayCircle className="w-6 h-6 mr-2" /> Iniciar Procesamiento de Lote ({pendingAiJobsCount} IA)</>}
-                  </Button>
-                  <Button
-                    onClick={handleDownloadAllImages}
-                    disabled={!canDownloadGenerated || isDownloadingIndividual || isBatchProcessing || !!itemBeingRefined || !!uploadingToDriveItemId}
-                    className="w-full text-white font-semibold py-3 px-4 text-lg focus:ring-4 focus:ring-primary/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:bg-pink-600/90 bg-pink-500" 
-                  >
-                    {isDownloadingIndividual ? <><Loader2 className="w-6 h-6 mr-2 animate-spin" /> Descargando IA...</> : <><Download className="w-6 h-6 mr-2" /> Descargar Imágenes IA</>}
-                  </Button>
-                </div>
-                
-                {isBatchProcessing && currentProcessingPromptJob() && (
-                  <div className="mt-6 p-3 text-accent-foreground bg-accent/80 rounded-md text-center text-sm">
-                      Procesando IA ({currentProcessingPromptJob()?.artStyleUsed}) - Trabajo {Math.min((currentJobIndexInQueue ?? 0) + 1, processingJobs.length)} de {processingJobs.length}: "<em>{currentProcessingPromptJob()!.originalPrompt.substring(0,40)}...</em>"
-                  </div>
-                )}
-                {!isBatchProcessing && displayList.length > 0 && processingJobs.length > 0 && (currentJobIndexInQueue !== null && currentJobIndexInQueue >= processingJobs.length) && pendingAiJobsCount === 0 && (
-                      <div className="mt-6 p-3 text-green-700 bg-green-500/20 rounded-md text-center text-sm font-semibold">
-                          ¡Procesamiento de lote IA completado!
-                      </div>
-                )}
-                
-                {/* Text Analyzer Section - For all users */}
-                <div className="mt-6 pt-6 border-t border-border">
-                  <h3 className="text-xl font-headline text-accent mb-3 flex items-center">
-                    <ListChecks className="mr-2 h-6 w-6" /> Analizador de Texto para Prompts
-                  </h3>
-                  {!showAdminPromptAnalyzer && (
-                    <Button onClick={() => setShowAdminPromptAnalyzer(true)} className="w-full bg-secondary hover:bg-secondary/80 text-secondary-foreground">
-                      <Sparkles className="mr-2 h-4 w-4" /> Iniciar Análisis de Texto
-                    </Button>
-                  )}
-                  {showAdminPromptAnalyzer && (
-                    <div className="space-y-4 p-4 border border-primary/30 rounded-lg bg-card/50 mt-2">
-                      <Textarea
-                        placeholder="Pega aquí el texto que contiene los prompts..."
-                        rows={8}
-                        value={adminPromptAnalysisText}
-                        onChange={(e) => setAdminPromptAnalysisText(e.target.value)}
-                        disabled={isAnalyzingText || extractedAdminPrompts.length > 0 || isAddingAdminPromptsToQueue}
-                        className="bg-background/70 border-primary focus-visible:ring-accent focus-visible:border-accent"
-                      />
-                      {extractedAdminPrompts.length === 0 && (
-                        <Button
-                          onClick={handleAnalyzeTextForPrompts}
-                          disabled={!adminPromptAnalysisText.trim() || isAnalyzingText || isAddingAdminPromptsToQueue}
-                          className="w-full"
+                <TabsContent value="generator">
+                    <main>
+                        <div className="mb-6">
+                        <Label className="block mb-3 text-sm font-medium text-accent">Elige el tipo de entrada:</Label>
+                        <RadioGroup
+                            value={inputMode}
+                            onValueChange={(value: string) => setInputMode(value as InputMode)}
+                            className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0 mb-4"
+                            disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || !!uploadingToDriveItemId}
                         >
-                          {isAnalyzingText ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                          Extraer Prompts del Texto
-                        </Button>
-                      )}
-
-                      {extractedAdminPrompts.length > 0 && (
-                        <div className="p-3 bg-primary/10 rounded-lg border border-primary/30">
-                          <h5 className="text-md font-medium text-primary mb-2">Prompts Detectados:</h5>
-                          <ul className="list-disc list-inside space-y-1 text-sm text-foreground">
-                            {extractedAdminPrompts.map((p, idx) => (
-                              <li key={idx}>{p}</li>
-                            ))}
-                          </ul>
-                          <div className="flex gap-2 mt-4">
-                            <Button
-                              onClick={handleAddAdminPromptsToQueue}
-                              disabled={isAddingAdminPromptsToQueue}
-                              className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-                            >
-                              {isAddingAdminPromptsToQueue ? <Loader2 className="animate-spin mr-2" /> : <PlayCircle className="mr-2 h-4 w-4" />}
-                              Generar Imágenes ({extractedAdminPrompts.length})
-                            </Button>
-                            <Button variant="outline" onClick={() => { setExtractedAdminPrompts([]); }} disabled={isAddingAdminPromptsToQueue}>
-                              Analizar de Nuevo
-                            </Button>
-                          </div>
+                            <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="url" id="mode_url" />
+                            <Label htmlFor="mode_url" className="flex items-center cursor-pointer"><LinkIcon size={16} className="mr-2 text-primary"/> URL de Imagen</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="title_prompt" id="mode_title_prompt" />
+                            <Label htmlFor="mode_title_prompt" className="flex items-center cursor-pointer"><Type size={16} className="mr-2 text-primary"/> Título + Prompt</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="prompt_only" id="mode_prompt_only" />
+                            <Label htmlFor="mode_prompt_only" className="flex items-center cursor-pointer"><MessageSquareText size={16} className="mr-2 text-primary"/> Solo Prompt</Label>
+                            </div>
+                        </RadioGroup>
                         </div>
-                      )}
-                       <Button variant="outline" onClick={() => { setShowAdminPromptAnalyzer(false); setAdminPromptAnalysisText(''); setExtractedAdminPrompts([]); setIsAnalyzingText(false); setIsAddingAdminPromptsToQueue(false); }} className="w-full mt-2">
-                        Cerrar Analizador
-                      </Button>
-                    </div>
-                  )}
-                </div>
 
-                {displayList.length > 0 && (
-                  <div className="mt-8 space-y-4">
-                    <h3 className="text-xl font-headline text-accent border-b-2 border-primary pb-2 mb-4">Cola de Procesamiento:</h3>
-                    {displayList.map((item, index) => (
-                      <div key={item.id} className="p-4 rounded-lg bg-card/75 border border-primary/70 shadow-md relative">
-                         <span className="absolute top-2 right-2 text-xs bg-primary/20 text-primary font-bold px-2 py-1 rounded-full">#{index + 1}</span>
-                        {item.type === 'title_comment' && ( 
-                          <div className="flex items-center">
-                            <Type size={20} className="mr-3 text-primary flex-shrink-0" />
-                            <p className="font-semibold text-md text-primary">{item.text}</p>
-                          </div>
+                        {inputMode === 'url' && (
+                        <div className="mb-6">
+                            <Label htmlFor="urlInput" className="block mb-2 text-sm font-medium text-accent">
+                            URL de la Imagen:
+                            </Label>
+                            <Input
+                            id="urlInput"
+                            type="url"
+                            className="w-full p-3 bg-background/70 border-primary border-2 rounded-lg focus-visible:ring-accent focus-visible:border-accent transition-all duration-300 ease-in-out placeholder:text-muted-foreground"
+                            placeholder="https://ejemplo.com/imagen.png"
+                            value={urlInput}
+                            onChange={(e) => setUrlInput(e.target.value)}
+                            disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || !!uploadingToDriveItemId}
+                            />
+                        </div>
                         )}
-                        {item.type === 'external_image' && (
-                          <div>
-                            <p className="font-semibold text-sm text-green-600 mb-1 flex items-center">
-                              <LinkIcon size={18} className="inline mr-2 align-text-bottom" />
-                              Imagen Externa: <span className="text-muted-foreground font-normal ml-1 truncate w-60" title={item.imageUrl}>{item.imageUrl}</span>
-                            </p>
-                            <div className="mt-3 p-1 border-2 border-dashed border-green-500/60 rounded-md bg-background/40">
-                                <img 
-                                  src={item.imageUrl} 
-                                  alt={`Imagen externa de ${item.imageUrl}`} 
-                                  className="w-full h-auto rounded object-contain max-h-[40vh]"
-                                  data-ai-hint="external content"
-                                  onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                                      const target = e.target as HTMLImageElement;
-                                      target.onerror = null; 
-                                      const parent = target.parentElement;
-                                      if (parent) {
-                                        parent.innerHTML = `<div class="text-red-500 p-2">Error al cargar imagen externa. Verifique que la URL sea pública y correcta.</div>`;
-                                      }
-                                  }}
-                                />
-                              </div>
-                          </div>
+
+                        {inputMode === 'title_prompt' && (
+                        <>
+                            <div className="mb-6">
+                            <Label htmlFor="titleInput" className="block mb-2 text-sm font-medium text-accent">
+                                Título (opcional, se añade como comentario):
+                            </Label>
+                            <Input
+                                id="titleInput"
+                                type="text"
+                                className="w-full p-3 bg-background/70 border-primary border-2 rounded-lg focus-visible:ring-accent focus-visible:border-accent transition-all duration-300 ease-in-out placeholder:text-muted-foreground"
+                                placeholder="Mi increíble título"
+                                value={titleInput}
+                                onChange={(e) => setTitleInput(e.target.value)}
+                                disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || !!uploadingToDriveItemId}
+                            />
+                            </div>
+                            <div className="mb-6">
+                            <Label htmlFor="promptForTitleInput" className="block mb-2 text-sm font-medium text-accent">
+                                Prompt para IA (opcional si solo quieres añadir título):
+                            </Label>
+                            <Textarea
+                                id="promptForTitleInput"
+                                rows={3}
+                                className="w-full p-3 bg-background/70 border-primary border-2 rounded-lg focus-visible:ring-accent focus-visible:border-accent transition-all duration-300 ease-in-out placeholder:text-muted-foreground resize-y"
+                                placeholder="Descripción detallada para la IA..."
+                                value={promptForTitleInput}
+                                onChange={(e) => setPromptForTitleInput(e.target.value)}
+                                disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || !!uploadingToDriveItemId || (aiJobsInQueueCount >= MAX_PROCESSING_JOBS && promptForTitleInput.length > 0)}
+                            />
+                            {aiJobsInQueueCount >= MAX_PROCESSING_JOBS && <p className="text-xs text-yellow-600 mt-1">Límite de prompts de IA ({MAX_PROCESSING_JOBS}) alcanzado para este lote.</p>}
+                            </div>
+                        </>
                         )}
-                        {item.type === 'skipped_prompt' && (
-                          <div>
-                              <p className="font-semibold text-sm text-yellow-500 mb-1">Entrada Omitida: <span className="text-muted-foreground font-normal">{item.text}</span></p>
-                              <p className="text-xs text-yellow-600">{item.reason}</p>
-                          </div>
+
+                        {inputMode === 'prompt_only' && (
+                        <div className="mb-6">
+                            <Label htmlFor="singlePromptInput" className="block mb-2 text-sm font-medium text-accent">
+                            Tu Prompt para IA:
+                            </Label>
+                            <Textarea
+                            id="singlePromptInput"
+                            rows={5}
+                            className="w-full p-3 bg-background/70 border-primary border-2 rounded-lg focus-visible:ring-accent focus-visible:border-accent transition-all duration-300 ease-in-out placeholder:text-muted-foreground resize-y"
+                            placeholder="Un gato cibernético en una ciudad lluviosa de neón..."
+                            value={singlePromptInput}
+                            onChange={(e) => setSinglePromptInput(e.target.value)}
+                            disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || !!uploadingToDriveItemId || (aiJobsInQueueCount >= MAX_PROCESSING_JOBS && singlePromptInput.length > 0)}
+                            />
+                            {aiJobsInQueueCount >= MAX_PROCESSING_JOBS && <p className="text-xs text-yellow-600 mt-1">Límite de prompts de IA ({MAX_PROCESSING_JOBS}) alcanzado para este lote.</p>}
+                        </div>
                         )}
-                        {item.type === 'prompt' && (
-                          <div>
-                            <p className="font-semibold text-sm text-accent mb-1">
-                              <MessageSquareText size={18} className="inline mr-2 align-text-bottom" />
-                              Prompt IA ({item.artStyleUsed || 'Estilo no especificado'}): <span className="text-foreground font-normal">{item.originalPrompt}</span>
-                            </p>
-                            {item.status === 'pending' && <p className="text-sm text-yellow-500 flex items-center mt-2"><Info size={16} className="mr-1"/> Pendiente IA...</p>}
-                            {item.status === 'processing' && <p className="text-sm text-blue-500 flex items-center mt-2"><Loader2 size={16} className="mr-1 animate-spin"/> Procesando IA...</p>}
-                            {item.status === 'refining' && <p className="text-sm text-purple-500 flex items-center mt-2"><Loader2 size={16} className="mr-1 animate-spin"/> Mejorando imagen IA...</p>}
-                            {item.status === 'failed' && item.error && (
-                              <div className="text-sm text-destructive-foreground p-2 bg-destructive/90 rounded mt-2">
-                                <AlertTriangle size={16} className="inline mr-1" /> Error IA: {item.error}
-                              </div>
-                            )}
-                            {item.status === 'completed' && item.imageUrl && (
-                              <>
-                                <div className="mt-3 p-1 border-2 border-dashed border-primary/60 rounded-md bg-background/40">
-                                  <img src={item.imageUrl} alt={`Generado por IA para: ${item.originalPrompt} (${item.artStyleUsed})`} className="w-full h-auto rounded object-contain max-h-[40vh]" data-ai-hint="generated art" />
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                  {!itemBeingRefined && !isBatchProcessing && !isDownloadingIndividual && !uploadingToDriveItemId &&(
-                                    <Button onClick={() => handleStartRefinement(item)} size="sm" variant="outline" className="mt-3 border-accent text-accent hover:bg-accent/10">
-                                      <Wand2 className="mr-2 h-4 w-4" /> Mejorar Imagen
+
+                        <div className="mb-6">
+                        <Label htmlFor="artStyle" className="block mb-2 text-sm font-medium text-accent flex items-center">
+                            <Palette size={18} className="mr-2"/> Estilo de Arte (para prompts de IA):
+                        </Label>
+                        <Select 
+                            value={selectedStyleValue} 
+                            onValueChange={setSelectedStyleValue}
+                            disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || !!uploadingToDriveItemId}
+                        >
+                            <SelectTrigger 
+                            id="artStyle"
+                            className="w-full bg-background/70 border-primary border-2 rounded-lg focus:ring-accent focus:border-accent transition-all duration-300 ease-in-out"
+                            >
+                            <SelectValue placeholder="Selecciona un estilo" />
+                            </SelectTrigger>
+                            <SelectContent>
+                            {artStyles.map(style => (
+                                <SelectItem key={style.value} value={style.value}>{style.name}</SelectItem>
+                            ))}
+                            </SelectContent>
+                        </Select>
+                        </div>
+                        
+                        <div className="mb-6">
+                            <Button
+                                onClick={handleAddItemToQueue}
+                                disabled={!canAddItem}
+                                className="w-full text-white font-semibold py-3 px-4 text-lg bg-primary hover:bg-primary/90 focus:ring-4 focus:ring-primary/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
+                            >
+                                <PlusCircle className="w-6 h-6 mr-2" /> Agregar a la Cola ({displayList.length}/{MAX_PROMPTS_OVERALL} total, {aiJobsInQueueCount}/{MAX_PROCESSING_JOBS} IA)
+                            </Button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <Button
+                                onClick={handleStartBatchProcessing}
+                                disabled={!canStartBatch}
+                                className="w-full text-white font-semibold py-3 px-4 text-lg focus:ring-4 focus:ring-accent/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:bg-accent/90 bg-accent"
+                            >
+                                {isBatchProcessing ? <><Loader2 className="w-6 h-6 mr-2 animate-spin" /> Procesando...</> : <><PlayCircle className="w-6 h-6 mr-2" /> Iniciar Lote IA ({pendingAiJobsCount})</>}
+                            </Button>
+                            <Button
+                                onClick={() => handleDownloadAllImages(false)}
+                                disabled={!canDownloadGenerated || isDownloadingIndividual || isDownloadingZip || isBatchProcessing || !!itemBeingRefined || !!uploadingToDriveItemId}
+                                className="w-full text-white font-semibold py-3 px-4 text-lg focus:ring-4 focus:ring-primary/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:bg-pink-600/90 bg-pink-500" 
+                            >
+                                {isDownloadingIndividual ? <><Loader2 className="w-6 h-6 mr-2 animate-spin" /> Descargando...</> : <><Download className="w-6 h-6 mr-2" /> Desc. Individual</>}
+                            </Button>
+                             <Button
+                                onClick={() => handleDownloadAllImagesAsZip(false)}
+                                disabled={!canDownloadGenerated || isDownloadingIndividual || isDownloadingZip || isBatchProcessing || !!itemBeingRefined || !!uploadingToDriveItemId}
+                                className="w-full text-white font-semibold py-3 px-4 text-lg focus:ring-4 focus:ring-primary/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:bg-teal-600/90 bg-teal-500"
+                            >
+                                {isDownloadingZip ? <><Loader2 className="w-6 h-6 mr-2 animate-spin" /> Comprimiendo...</> : <><FileArchive className="w-6 h-6 mr-2" /> Desc. ZIP</>}
+                            </Button>
+                        </div>
+                        
+                        {isBatchProcessing && currentProcessingPromptJob() && (
+                        <div className="mt-6 p-3 text-accent-foreground bg-accent/80 rounded-md text-center text-sm">
+                            Procesando IA ({currentProcessingPromptJob()?.artStyleUsed}) - Trabajo {Math.min((currentJobIndexInQueue ?? 0) + 1, processingJobs.length)} de {processingJobs.length}: "<em>{currentProcessingPromptJob()!.originalPrompt.substring(0,40)}...</em>"
+                        </div>
+                        )}
+                        {!isBatchProcessing && displayList.length > 0 && processingJobs.length > 0 && (currentJobIndexInQueue !== null && currentJobIndexInQueue >= processingJobs.length) && pendingAiJobsCount === 0 && (
+                            <div className="mt-6 p-3 text-green-700 bg-green-500/20 rounded-md text-center text-sm font-semibold">
+                                ¡Procesamiento de lote IA (Principal) completado!
+                            </div>
+                        )}
+                        
+                        {displayList.length > 0 && (
+                        <div className="mt-8 space-y-4">
+                            <h3 className="text-xl font-headline text-accent border-b-2 border-primary pb-2 mb-4">Cola Principal:</h3>
+                            {displayList.map((item, index) => renderQueueItem(item, index, false))}
+                        </div>
+                        )}
+                    </main>
+                </TabsContent>
+
+                <TabsContent value="analyzer">
+                     <main>
+                        <div className="space-y-4 p-4 border border-primary/30 rounded-lg bg-card/50 mt-2">
+                            <h3 className="text-xl font-headline text-accent mb-3 flex items-center">
+                                <ListChecks className="mr-2 h-6 w-6" /> Analizador de Texto para Prompts
+                            </h3>
+                            <Textarea
+                                placeholder="Pega aquí el texto que contiene los prompts..."
+                                rows={6}
+                                value={analyzerRawText}
+                                onChange={(e) => setAnalyzerRawText(e.target.value)}
+                                disabled={isAnalyzingText || isAddingExtractedToAnalyzerQueue}
+                                className="bg-background/70 border-primary focus-visible:ring-accent focus-visible:border-accent"
+                            />
+                            <Button
+                                onClick={handleAnalyzeTextForPrompts}
+                                disabled={!analyzerRawText.trim() || isAnalyzingText || isAddingExtractedToAnalyzerQueue}
+                                className="w-full"
+                            >
+                                {isAnalyzingText ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                                Extraer Prompts del Texto
+                            </Button>
+
+                            {analyzerExtractedPrompts.length > 0 && (
+                                <div className="p-3 bg-primary/10 rounded-lg border border-primary/30">
+                                <h5 className="text-md font-medium text-primary mb-2">Prompts Detectados ({analyzerExtractedPrompts.length}):</h5>
+                                <ul className="list-disc list-inside space-y-1 text-sm text-foreground max-h-40 overflow-y-auto">
+                                    {analyzerExtractedPrompts.map((p, idx) => (
+                                    <li key={idx}>{p}</li>
+                                    ))}
+                                </ul>
+                                <div className="flex gap-2 mt-4">
+                                    <Button
+                                        onClick={handleAddExtractedPromptsToAnalyzerQueue}
+                                        disabled={isAddingExtractedToAnalyzerQueue || analyzerDisplayList.length + analyzerExtractedPrompts.length > MAX_PROMPTS_OVERALL || analyzerProcessingJobs.filter(j=>j.type === 'prompt').length + analyzerExtractedPrompts.length > MAX_PROCESSING_JOBS}
+                                        className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                                    >
+                                    {isAddingExtractedToAnalyzerQueue ? <Loader2 className="animate-spin mr-2" /> : <PlusCircle className="mr-2 h-4 w-4" />}
+                                    Añadir a Cola Analizador ({analyzerExtractedPrompts.length})
                                     </Button>
-                                  )}
-                                  {!isBatchProcessing && !isDownloadingIndividual && !itemBeingRefined && (
-                                      <Button
-                                        onClick={() => handleUploadToDrive(item)}
-                                        disabled={uploadingToDriveItemId === item.id || !googleDriveApiLoaded || !process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
-                                        size="sm"
-                                        variant="outline"
-                                        className="mt-3 border-blue-500 text-blue-500 hover:text-blue-700 hover:bg-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
-                                        title={!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? "Google Client ID no configurado" : (isGoogleDriveAuthenticated ? "Subir a Google Drive" : "Autenticar con Google Drive para subir")}
-                                      >
-                                        {uploadingToDriveItemId === item.id ? (
-                                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        ) : (
-                                          <UploadCloud className="mr-2 h-4 w-4" />
-                                        )}
-                                        {isGoogleDriveAuthenticated ? 'Subir a Drive' : 'Autenticar y Subir'}
-                                      </Button>
-                                  )}
+                                    <Button variant="outline" onClick={() => { setAnalyzerExtractedPrompts([]); }} disabled={isAddingExtractedToAnalyzerQueue}>
+                                        Limpiar Detectados
+                                    </Button>
                                 </div>
-                                 {!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && googleDriveApiLoaded === false && (
-                                    <p className="text-xs text-yellow-600 mt-1">La subida a Google Drive está deshabilitada porque Google Client ID no está configurado en las variables de entorno.</p>
-                                 )}
-                              </>
-                            )}
-                            {itemBeingRefined?.id === item.id && (
-                              <div className="mt-4 p-3 border border-dashed border-accent/70 rounded-lg bg-card/50">
-                                <Label htmlFor={`refine-${item.id}`} className="text-sm font-medium text-accent flex items-center mb-2">
-                                  <Wand2 size={16} className="mr-2"/> Prompt de Mejora:
-                                </Label>
-                                <Textarea
-                                  id={`refine-${item.id}`}
-                                  value={refinementPromptText}
-                                  onChange={(e) => setRefinementPromptText(e.target.value)}
-                                  placeholder="Ej: hacerlo más oscuro, añadir un gato, cambiar el color del cielo..."
-                                  rows={2}
-                                  className="my-2 bg-background/70 border-accent/50 focus-visible:border-accent"
-                                  disabled={isSubmittingRefinement}
-                                />
-                                <div className="flex gap-2 mt-2">
-                                  <Button onClick={handleSubmitRefinement} size="sm" disabled={isSubmittingRefinement || !refinementPromptText.trim()} className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                                    {isSubmittingRefinement ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : <Send className="mr-2 h-4 w-4" />} Aplicar Mejora
-                                  </Button>
-                                  <Button onClick={handleCancelRefinement} size="sm" variant="ghost" disabled={isSubmittingRefinement}>
-                                    Cancelar
-                                  </Button>
+                                {(analyzerDisplayList.length + analyzerExtractedPrompts.length > MAX_PROMPTS_OVERALL || analyzerProcessingJobs.filter(j=>j.type === 'prompt').length + analyzerExtractedPrompts.length > MAX_PROCESSING_JOBS) &&
+                                    <p className="text-xs text-yellow-600 mt-1">Se superaría el límite de la cola del analizador ({MAX_PROMPTS_OVERALL} total o {MAX_PROCESSING_JOBS} IA).</p>
+                                }
                                 </div>
-                              </div>
                             )}
-                          </div>
+                        </div>
+                        
+                        <div className="mt-6 mb-6">
+                            <Label htmlFor="analyzerArtStyle" className="block mb-2 text-sm font-medium text-accent flex items-center">
+                                <Palette size={18} className="mr-2"/> Estilo de Arte (Analizador):
+                            </Label>
+                            <Select 
+                                value={analyzerSelectedStyleValue} 
+                                onValueChange={setAnalyzerSelectedStyleValue}
+                                disabled={isAnalyzerBatchProcessing || isAnalyzerDownloadingIndividual || isAnalyzerDownloadingZip || !!analyzerItemBeingRefined || !!analyzerUploadingToDriveItemId}
+                            >
+                                <SelectTrigger 
+                                id="analyzerArtStyle"
+                                className="w-full bg-background/70 border-primary border-2 rounded-lg focus:ring-accent focus:border-accent transition-all duration-300 ease-in-out"
+                                >
+                                <SelectValue placeholder="Selecciona un estilo" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                {artStyles.map(style => (
+                                    <SelectItem key={`analyzer-${style.value}`} value={style.value}>{style.name}</SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                             <p className="text-xs text-muted-foreground mt-1">
+                                Elementos en cola: {analyzerDisplayList.length}/{MAX_PROMPTS_OVERALL} total, {analyzerAiJobsInQueueCount}/{MAX_PROCESSING_JOBS} IA.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <Button
+                                onClick={handleAnalyzerStartBatchProcessing}
+                                disabled={!canAnalyzerStartBatch}
+                                className="w-full text-white font-semibold py-3 px-4 text-lg focus:ring-4 focus:ring-accent/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:bg-accent/90 bg-accent"
+                            >
+                                {isAnalyzerBatchProcessing ? <><Loader2 className="w-6 h-6 mr-2 animate-spin" /> Procesando (A)...</> : <><PlayCircle className="w-6 h-6 mr-2" /> Iniciar Lote IA (A) ({analyzerPendingAiJobsCount})</>}
+                            </Button>
+                            <Button
+                                onClick={() => handleDownloadAllImages(true)}
+                                disabled={!canAnalyzerDownloadGenerated || isAnalyzerDownloadingIndividual || isAnalyzerDownloadingZip || isAnalyzerBatchProcessing || !!analyzerItemBeingRefined || !!analyzerUploadingToDriveItemId}
+                                className="w-full text-white font-semibold py-3 px-4 text-lg focus:ring-4 focus:ring-primary/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:bg-pink-600/90 bg-pink-500" 
+                            >
+                                {isAnalyzerDownloadingIndividual ? <><Loader2 className="w-6 h-6 mr-2 animate-spin" /> Descargando (A)...</> : <><Download className="w-6 h-6 mr-2" /> Desc. Individual (A)</>}
+                            </Button>
+                             <Button
+                                onClick={() => handleDownloadAllImagesAsZip(true)}
+                                disabled={!canAnalyzerDownloadGenerated || isAnalyzerDownloadingIndividual || isAnalyzerDownloadingZip || isAnalyzerBatchProcessing || !!analyzerItemBeingRefined || !!analyzerUploadingToDriveItemId}
+                                className="w-full text-white font-semibold py-3 px-4 text-lg focus:ring-4 focus:ring-primary/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:bg-teal-600/90 bg-teal-500"
+                            >
+                                {isAnalyzerDownloadingZip ? <><Loader2 className="w-6 h-6 mr-2 animate-spin" /> Comprimiendo (A)...</> : <><FileArchive className="w-6 h-6 mr-2" /> Desc. ZIP (A)</>}
+                            </Button>
+                        </div>
+
+                        {isAnalyzerBatchProcessing && currentAnalyzerProcessingPromptJob() && (
+                        <div className="mt-6 p-3 text-accent-foreground bg-accent/80 rounded-md text-center text-sm">
+                            Procesando IA (Analizador) ({currentAnalyzerProcessingPromptJob()?.artStyleUsed}) - Trabajo {Math.min((currentAnalyzerJobIndexInQueue ?? 0) + 1, analyzerProcessingJobs.length)} de {analyzerProcessingJobs.length}: "<em>{currentAnalyzerProcessingPromptJob()!.originalPrompt.substring(0,40)}...</em>"
+                        </div>
                         )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </main>
+                        {!isAnalyzerBatchProcessing && analyzerDisplayList.length > 0 && analyzerProcessingJobs.length > 0 && (currentAnalyzerJobIndexInQueue !== null && currentAnalyzerJobIndexInQueue >= analyzerProcessingJobs.length) && analyzerPendingAiJobsCount === 0 && (
+                            <div className="mt-6 p-3 text-green-700 bg-green-500/20 rounded-md text-center text-sm font-semibold">
+                                ¡Procesamiento de lote IA (Analizador) completado!
+                            </div>
+                        )}
+
+                        {analyzerDisplayList.length > 0 && (
+                        <div className="mt-8 space-y-4">
+                            <h3 className="text-xl font-headline text-accent border-b-2 border-primary pb-2 mb-4">Cola del Analizador:</h3>
+                            {analyzerDisplayList.map((item, index) => renderQueueItem(item, index, true))}
+                        </div>
+                        )}
+                     </main>
+                </TabsContent>
+             </Tabs>
               
               <footer className="mt-8 text-center">
                 <p className="text-xs text-muted-foreground">
@@ -1351,4 +1617,3 @@ const ImageGeneratorApp = () => {
 };
 
 export default ImageGeneratorApp;
-
