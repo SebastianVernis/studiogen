@@ -1,6 +1,6 @@
 
 export const MAX_PROMPTS_OVERALL = 50;
-export const MAX_PROCESSING_JOBS = 20;
+export const MAX_PROCESSING_JOBS = 10;
 export const TITLE_WORD_THRESHOLD = 6;
 export const DOWNLOAD_DELAY_MS = 1500;
 
