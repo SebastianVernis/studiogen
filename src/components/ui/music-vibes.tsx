@@ -1,12 +1,12 @@
 
 "use client";
 
-import { Music2, Disc3, ActivitySquare } from 'lucide-react';
+import { Music2, Disc3, ActivitySquare, LucideProps } from 'lucide-react';
 import React, { useEffect, useState, ComponentType } from 'react';
 
 interface IconConfig {
   id: number;
-  IconComponent: ComponentType<{ className?: string; style?: React.CSSProperties; size?: number; fill?: string; strokeWidth?: number }>;
+  IconComponent: ComponentType<LucideProps>;
   style: React.CSSProperties;
   delay: string;
   duration: string;

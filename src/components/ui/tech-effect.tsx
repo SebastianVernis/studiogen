@@ -1,12 +1,12 @@
 
 "use client";
 
-import { Cpu, CircuitBoard, Code2 } from 'lucide-react'; // Using Code2 as Binary is not available
+import { Cpu, CircuitBoard, Code2, LucideProps } from 'lucide-react'; // Using Code2 as Binary is not available
 import React, { useEffect, useState, ComponentType } from 'react';
 
 interface IconConfig {
   id: number;
-  IconComponent: ComponentType<{ className?: string; style?: React.CSSProperties; size?: number; fill?: string }>;
+  IconComponent: ComponentType<LucideProps>;
   style: React.CSSProperties;
   delay: string;
   duration: string;

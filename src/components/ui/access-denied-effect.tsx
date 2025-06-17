@@ -1,12 +1,12 @@
 
 "use client";
 
-import { Ban, Lock, AlertOctagon } from 'lucide-react';
+import { Ban, Lock, AlertOctagon, LucideProps } from 'lucide-react';
 import React, { useEffect, useState, ComponentType } from 'react';
 
 interface IconConfig {
   id: number;
-  IconComponent: ComponentType<{ className?: string; style?: React.CSSProperties; size?: number; fill?: string }>;
+  IconComponent: ComponentType<LucideProps>;
   style: React.CSSProperties;
   delay: string;
   duration: string;

@@ -1,12 +1,12 @@
 
 "use client";
 
-import { DollarSign, Landmark, CreditCard } from 'lucide-react';
+import { DollarSign, Landmark, CreditCard, LucideProps } from 'lucide-react';
 import React, { useEffect, useState, ComponentType } from 'react';
 
 interface MoneyIconConfig {
   id: number;
-  IconComponent: ComponentType<{ className?: string; style?: React.CSSProperties; size?: number; fill?: string; color?: string }>;
+  IconComponent: ComponentType<LucideProps>;
   style: React.CSSProperties;
   delay: string;
   duration: string;

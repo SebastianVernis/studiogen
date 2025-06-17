@@ -60,6 +60,11 @@ const applyArtisticStyleToImageFlow = ai.defineFlow(
         ],
       },
     });
-    return {image: media.url!};
+    
+    if (!media || !media.url) {
+      throw new Error('Failed to generate image: No media returned from AI model');
+    }
+    
+    return {image: media.url};
   }
 );

@@ -52,6 +52,10 @@ const generateImageFromPromptFlow = ai.defineFlow(
       },
     });
 
-    return {imageUrl: media.url!};
+    if (!media || !media.url) {
+      throw new Error('Failed to generate image: No media returned from AI model');
+    }
+
+    return {imageUrl: media.url};
   }
 );
