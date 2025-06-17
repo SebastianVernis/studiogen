@@ -65,15 +65,11 @@ const ImageGeneratorApp = () => {
   const [isPasswordProtectionGloballyDisabled, setIsPasswordProtectionGloballyDisabled] = useState(true);
   const [globalProtectionButtonText, setGlobalProtectionButtonText] = useState('');
 
-  // Google Drive functionality disabled - using constants instead of state
-  const googleDriveApiLoaded = false;
-  const isGoogleDriveAuthenticated = false;
-  const uploadingToDriveItemId = null;
-  const analyzerUploadingToDriveItemId = null;
-  const setUploadingToDriveItemId = (value: any) => {}; // stub
-  const setAnalyzerUploadingToDriveItemId = (value: any) => {}; // stub
-  const setGoogleDriveApiLoaded = (value: boolean) => {}; // stub
-  const setIsGoogleDriveAuthenticated = (value: boolean) => {}; // stub
+  // Google Drive functionality disabled
+  // const [googleDriveApiLoaded, setGoogleDriveApiLoaded] = useState(false);
+  // const [isGoogleDriveAuthenticated, setIsGoogleDriveAuthenticated] = useState(false);
+  // const [uploadingToDriveItemId, setUploadingToDriveItemId] = useState<number | null>(null);
+  // const [analyzerUploadingToDriveItemId, setAnalyzerUploadingToDriveItemId] = useState<number | null>(null);
 
 
   // States for Main Generator Tab
@@ -226,7 +222,7 @@ const ImageGeneratorApp = () => {
          setGoogleDriveApiLoaded(false);
       }
     };
-    // initGoogleDriveApi(); // Disabled - Google Drive functionality removed
+    initGoogleDriveApi();
   }, [toast]);
 
   const handleGoogleDriveAuth = async () => {
@@ -1250,7 +1246,7 @@ const ImageGeneratorApp = () => {
                             value={inputMode}
                             onValueChange={(value: string) => setInputMode(value as InputMode)}
                             className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0 mb-4"
-                            disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || false}
+                            disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || !!uploadingToDriveItemId}
                         >
                             <div className="flex items-center space-x-2">
                             <RadioGroupItem value="url" id="mode_url" />
@@ -1279,7 +1275,7 @@ const ImageGeneratorApp = () => {
                             placeholder="https://ejemplo.com/imagen.png"
                             value={urlInput}
                             onChange={(e) => setUrlInput(e.target.value)}
-                            disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || false}
+                            disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || !!uploadingToDriveItemId}
                             />
                         </div>
                         )}
@@ -1297,7 +1293,7 @@ const ImageGeneratorApp = () => {
                                 placeholder="Mi increíble título"
                                 value={titleInput}
                                 onChange={(e) => setTitleInput(e.target.value)}
-                                disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || false}
+                                disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || !!uploadingToDriveItemId}
                             />
                             </div>
                             <div className="mb-6">
@@ -1311,7 +1307,7 @@ const ImageGeneratorApp = () => {
                                 placeholder="Descripción detallada para la IA..."
                                 value={promptForTitleInput}
                                 onChange={(e) => setPromptForTitleInput(e.target.value)}
-                                disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || false || (aiJobsInQueueCount >= MAX_PROCESSING_JOBS && promptForTitleInput.length > 0)}
+                                disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || !!uploadingToDriveItemId || (aiJobsInQueueCount >= MAX_PROCESSING_JOBS && promptForTitleInput.length > 0)}
                             />
                             {aiJobsInQueueCount >= MAX_PROCESSING_JOBS && <p className="text-xs text-yellow-600 mt-1">Límite de prompts de IA ({MAX_PROCESSING_JOBS}) alcanzado para este lote.</p>}
                             </div>
@@ -1330,7 +1326,7 @@ const ImageGeneratorApp = () => {
                             placeholder="Un gato cibernético en una ciudad lluviosa de neón..."
                             value={singlePromptInput}
                             onChange={(e) => setSinglePromptInput(e.target.value)}
-                            disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || false || (aiJobsInQueueCount >= MAX_PROCESSING_JOBS && singlePromptInput.length > 0)}
+                            disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || !!uploadingToDriveItemId || (aiJobsInQueueCount >= MAX_PROCESSING_JOBS && singlePromptInput.length > 0)}
                             />
                             {aiJobsInQueueCount >= MAX_PROCESSING_JOBS && <p className="text-xs text-yellow-600 mt-1">Límite de prompts de IA ({MAX_PROCESSING_JOBS}) alcanzado para este lote.</p>}
                         </div>
@@ -1343,7 +1339,7 @@ const ImageGeneratorApp = () => {
                         <Select 
                             value={selectedStyleValue} 
                             onValueChange={setSelectedStyleValue}
-                            disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || false}
+                            disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || !!uploadingToDriveItemId}
                         >
                             <SelectTrigger 
                             id="artStyle"
@@ -1379,14 +1375,14 @@ const ImageGeneratorApp = () => {
                             </Button>
                             <Button
                                 onClick={() => handleDownloadAllImages(false)}
-                                disabled={!canDownloadGenerated || isDownloadingIndividual || isDownloadingZip || isBatchProcessing || !!itemBeingRefined || false}
+                                disabled={!canDownloadGenerated || isDownloadingIndividual || isDownloadingZip || isBatchProcessing || !!itemBeingRefined || !!uploadingToDriveItemId}
                                 className="w-full text-white font-semibold py-3 px-4 text-lg focus:ring-4 focus:ring-primary/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:bg-pink-600/90 bg-pink-500" 
                             >
                                 {isDownloadingIndividual ? <><Loader2 className="w-6 h-6 mr-2 animate-spin" /> Descargando...</> : <><Download className="w-6 h-6 mr-2" /> Desc. Individual</>}
                             </Button>
                              <Button
                                 onClick={() => handleDownloadAllImagesAsZip(false)}
-                                disabled={!canDownloadGenerated || isDownloadingIndividual || isDownloadingZip || isBatchProcessing || !!itemBeingRefined || false}
+                                disabled={!canDownloadGenerated || isDownloadingIndividual || isDownloadingZip || isBatchProcessing || !!itemBeingRefined || !!uploadingToDriveItemId}
                                 className="w-full text-white font-semibold py-3 px-4 text-lg focus:ring-4 focus:ring-primary/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:bg-teal-600/90 bg-teal-500"
                             >
                                 {isDownloadingZip ? <><Loader2 className="w-6 h-6 mr-2 animate-spin" /> Comprimiendo...</> : <><FileArchive className="w-6 h-6 mr-2" /> Desc. ZIP</>}
@@ -1471,7 +1467,7 @@ const ImageGeneratorApp = () => {
                             <Select 
                                 value={analyzerSelectedStyleValue} 
                                 onValueChange={setAnalyzerSelectedStyleValue}
-                                disabled={isAnalyzerBatchProcessing || isAnalyzerDownloadingIndividual || isAnalyzerDownloadingZip || !!analyzerItemBeingRefined || false}
+                                disabled={isAnalyzerBatchProcessing || isAnalyzerDownloadingIndividual || isAnalyzerDownloadingZip || !!analyzerItemBeingRefined || !!analyzerUploadingToDriveItemId}
                             >
                                 <SelectTrigger 
                                 id="analyzerArtStyle"
@@ -1500,14 +1496,14 @@ const ImageGeneratorApp = () => {
                             </Button>
                             <Button
                                 onClick={() => handleDownloadAllImages(true)}
-                                disabled={!canAnalyzerDownloadGenerated || isAnalyzerDownloadingIndividual || isAnalyzerDownloadingZip || isAnalyzerBatchProcessing || !!analyzerItemBeingRefined || false}
+                                disabled={!canAnalyzerDownloadGenerated || isAnalyzerDownloadingIndividual || isAnalyzerDownloadingZip || isAnalyzerBatchProcessing || !!analyzerItemBeingRefined || !!analyzerUploadingToDriveItemId}
                                 className="w-full text-white font-semibold py-3 px-4 text-lg focus:ring-4 focus:ring-primary/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:bg-pink-600/90 bg-pink-500" 
                             >
                                 {isAnalyzerDownloadingIndividual ? <><Loader2 className="w-6 h-6 mr-2 animate-spin" /> Descargando (A)...</> : <><Download className="w-6 h-6 mr-2" /> Desc. Individual (A)</>}
                             </Button>
                              <Button
                                 onClick={() => handleDownloadAllImagesAsZip(true)}
-                                disabled={!canAnalyzerDownloadGenerated || isAnalyzerDownloadingIndividual || isAnalyzerDownloadingZip || isAnalyzerBatchProcessing || !!analyzerItemBeingRefined || false}
+                                disabled={!canAnalyzerDownloadGenerated || isAnalyzerDownloadingIndividual || isAnalyzerDownloadingZip || isAnalyzerBatchProcessing || !!analyzerItemBeingRefined || !!analyzerUploadingToDriveItemId}
                                 className="w-full text-white font-semibold py-3 px-4 text-lg focus:ring-4 focus:ring-primary/50 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed hover:bg-teal-600/90 bg-teal-500"
                             >
                                 {isAnalyzerDownloadingZip ? <><Loader2 className="w-6 h-6 mr-2 animate-spin" /> Comprimiendo (A)...</> : <><FileArchive className="w-6 h-6 mr-2" /> Desc. ZIP (A)</>}

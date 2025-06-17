@@ -17,3 +17,24 @@ https://nextjs.org/telemetry
  ○ Compiling / ...
  ✓ Compiled / in 9.9s
  HEAD / 200 in 11646ms
+ GET / 200 in 193ms
+ GET / 200 in 199ms
+ ⚠ Cross origin request detected from 82d06ebdab49e803c6.blackbx.ai to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ ⨯ Error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent: [400 Bad Request] API key not valid. Please pass a valid API key. [{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"API_KEY_INVALID","domain":"googleapis.com","metadata":{"service":"generativelanguage.googleapis.com"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"API key not valid. Please pass a valid API key."}]
+    at async (src/ai/flows/generate-image-from-prompt.ts:41:20)
+  39 |   },
+  40 |   async input => {
+> 41 |     const {media} = await ai.generate({
+     |                    ^
+  42 |       model: 'googleai/gemini-2.0-flash-exp',
+  43 |       prompt: input.prompt + ", imagen 4",
+  44 |       config: { {
+  status: 400,
+  statusText: 'Bad Request',
+  errorDetails: [Array],
+  traceId: '8d8e8dfc34191078a573ca39f47092ca',
+  digest: '3609029124'
+}
+ POST / 500 in 1186ms
+[?25h
