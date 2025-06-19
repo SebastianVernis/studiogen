@@ -1,35 +1,21 @@
 
 > nextn@0.1.0 dev
-> next dev --turbopack -p 9002 --port 9002 --hostname 0.0.0.0
+> next dev --turbopack -p 9002 --hostname 0.0.0.0
 
    ▲ Next.js 15.3.3 (Turbopack)
    - Local:        http://localhost:9002
    - Network:      http://0.0.0.0:9002
-   - Environments: .env.local
 
  ✓ Starting...
- ✓ Ready in 1792ms
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+ ✓ Ready in 1495ms
  ○ Compiling / ...
- ✓ Compiled / in 10.3s
- ⨯ ReferenceError: uploadingToDriveItemId is not defined
-    at ImageGeneratorApp (src/app/page.tsx:1249:130)
-  1247 |                             onValueChange={(value: string) => setInputMode(value as InputMode)}
-  1248 |                             className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0 mb-4"
-> 1249 |                             disabled={isBatchProcessing || isDownloadingIndividual || isDownloadingZip || !!itemBeingRefined || !!uploadingToDriveItemId}
-       |                                                                                                                                  ^
-  1250 |                         >
-  1251 |                             <div className="flex items-center space-x-2">
-  1252 |                             <RadioGroupItem value="url" id="mode_url" /> {
-  digest: '512619171'
-}
- HEAD / 500 in 12136ms
- ✓ Compiled in 214ms
- ✓ Compiled / in 83ms
- HEAD / 200 in 1134ms
-   Reload env: .env.local
- GET / 200 in 1057ms
- ⚠ Cross origin request detected from c67d81550c5366a794.blackbx.ai to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+ ✓ Compiled / in 12.2s
+ HEAD / 200 in 13940ms
+ GET / 200 in 275ms
+ ⚠ Cross origin request detected from ab748bb3371130dd9f.blackbx.ai to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
 Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
- HEAD / 200 in 195ms
- GET / 200 in 200ms
- HEAD / 200 in 923ms
