@@ -1,10 +1,11 @@
 
 > nextn@0.1.0 dev
-> next dev --turbopack -p 9002 --hostname 0.0.0.0
+> next dev --turbopack -p 9002
 
    ▲ Next.js 15.3.3 (Turbopack)
    - Local:        http://localhost:9002
-   - Network:      http://0.0.0.0:9002
+   - Network:      http://169.254.0.21:9002
+   - Environments: .env.local
 
  ✓ Starting...
 Attention: Next.js now collects completely anonymous telemetry regarding usage.
@@ -12,10 +13,45 @@ This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
- ✓ Ready in 1495ms
+ ✓ Ready in 1493ms
+ ○ Compiling /api/test-db ...
+ ✓ Compiled /api/test-db in 1332ms
+Ignoring invalid configuration option passed to Connection: acquireTimeout. This is currently a warning, but in future versions of MySQL2, an error will be thrown if you pass an invalid configuration option to a Connection
+Ignoring invalid configuration option passed to Connection: timeout. This is currently a warning, but in future versions of MySQL2, an error will be thrown if you pass an invalid configuration option to a Connection
+Testing database connection...
+Database connection error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+❌ Database connection failed: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+ GET /api/test-db 500 in 1743ms
  ○ Compiling / ...
- ✓ Compiled / in 12.2s
- HEAD / 200 in 13940ms
- GET / 200 in 275ms
- ⚠ Cross origin request detected from ab748bb3371130dd9f.blackbx.ai to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
-Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ ✓ Compiled / in 7.5s
+ HEAD / 200 in 8808ms
+Ignoring invalid configuration option passed to Connection: acquireTimeout. This is currently a warning, but in future versions of MySQL2, an error will be thrown if you pass an invalid configuration option to a Connection
+Ignoring invalid configuration option passed to Connection: timeout. This is currently a warning, but in future versions of MySQL2, an error will be thrown if you pass an invalid configuration option to a Connection
+Testing database connection...
+Database connection error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+❌ Database connection failed: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+ GET /api/test-db 500 in 223ms
