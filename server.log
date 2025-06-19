@@ -1,21 +1,290 @@
 
 > nextn@0.1.0 dev
-> next dev --turbopack -p 9002 --hostname 0.0.0.0
+> next dev --turbopack -p 9002 -H 0.0.0.0
 
    ▲ Next.js 15.3.3 (Turbopack)
    - Local:        http://localhost:9002
    - Network:      http://0.0.0.0:9002
+   - Environments: .env.local
 
  ✓ Starting...
-Attention: Next.js now collects completely anonymous telemetry regarding usage.
-This information is used to shape Next.js' roadmap and prioritize features.
-You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-https://nextjs.org/telemetry
-
- ✓ Ready in 1495ms
+ ✓ Ready in 1462ms
  ○ Compiling / ...
- ✓ Compiled / in 12.2s
- HEAD / 200 in 13940ms
- GET / 200 in 275ms
- ⚠ Cross origin request detected from ab748bb3371130dd9f.blackbx.ai to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+ ✓ Compiled / in 6.9s
+ HEAD / 200 in 8021ms
+ ○ Compiling /api/test-db ...
+ ✓ Compiled /api/test-db in 964ms
+Ignoring invalid configuration option passed to Connection: acquireTimeout. This is currently a warning, but in future versions of MySQL2, an error will be thrown if you pass an invalid configuration option to a Connection
+Ignoring invalid configuration option passed to Connection: timeout. This is currently a warning, but in future versions of MySQL2, an error will be thrown if you pass an invalid configuration option to a Connection
+Ignoring invalid configuration option passed to Connection: reconnect. This is currently a warning, but in future versions of MySQL2, an error will be thrown if you pass an invalid configuration option to a Connection
+Testing database connection...
+Testing database connection to: db5018065428.hosting-data.io
+Database connection error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+❌ Database connection failed: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+DNS Resolution Error: Cannot resolve hostname db5018065428.hosting-data.io
+Please verify:
+1. The hostname is correct
+2. You have internet connectivity
+3. The database server is accessible from this network
+Using fallback mock data for development...
+Database connection error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+Query execution error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+Query: SELECT 1 as test
+Params: []
+Database query failed, using mock data for development
+Database connection error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+Query execution error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+Query: SHOW TABLES
+Params: []
+Database query failed, using mock data for development
+Database connection error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+Query execution error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+Query: SELECT DATABASE() as current_db, VERSION() as version
+Params: []
+Database query failed, using mock data for development
+ GET /api/test-db 200 in 1167ms
+ ○ Compiling /database-test ...
+ ✓ Compiled /database-test in 1156ms
+ HEAD /database-test 200 in 1251ms
+ ○ Compiling /api/migrate ...
+ ✓ Compiled /api/migrate in 1158ms
+🚀 Starting database migration via API...
+Testing database connection to: db5018065428.hosting-data.io
+Database connection error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+❌ Database connection failed: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+DNS Resolution Error: Cannot resolve hostname db5018065428.hosting-data.io
+Please verify:
+1. The hostname is correct
+2. You have internet connectivity
+3. The database server is accessible from this network
+ POST /api/migrate 500 in 1251ms
+Ignoring invalid configuration option passed to Connection: acquireTimeout. This is currently a warning, but in future versions of MySQL2, an error will be thrown if you pass an invalid configuration option to a Connection
+Ignoring invalid configuration option passed to Connection: timeout. This is currently a warning, but in future versions of MySQL2, an error will be thrown if you pass an invalid configuration option to a Connection
+Ignoring invalid configuration option passed to Connection: reconnect. This is currently a warning, but in future versions of MySQL2, an error will be thrown if you pass an invalid configuration option to a Connection
+🚀 Starting database migration via API...
+Testing database connection to: db5018065428.hosting-data.io
+Database connection error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+❌ Database connection failed: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+DNS Resolution Error: Cannot resolve hostname db5018065428.hosting-data.io
+Please verify:
+1. The hostname is correct
+2. You have internet connectivity
+3. The database server is accessible from this network
+Database connection failed, simulating migration for development...
+ POST /api/migrate 200 in 308ms
+ ○ Compiling /api/test-models ...
+ ✓ Compiled /api/test-models in 724ms
+Ignoring invalid configuration option passed to Connection: acquireTimeout. This is currently a warning, but in future versions of MySQL2, an error will be thrown if you pass an invalid configuration option to a Connection
+Ignoring invalid configuration option passed to Connection: timeout. This is currently a warning, but in future versions of MySQL2, an error will be thrown if you pass an invalid configuration option to a Connection
+Ignoring invalid configuration option passed to Connection: reconnect. This is currently a warning, but in future versions of MySQL2, an error will be thrown if you pass an invalid configuration option to a Connection
+Testing database models...
+Database connection error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+Query execution error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+Query: SELECT * FROM users ORDER BY created_at DESC LIMIT ? OFFSET ?
+Params: [ 5, 0 ]
+Database connection error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+Query execution error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+Query: 
+      SELECT * FROM image_generations 
+      WHERE status = ? 
+      ORDER BY created_at ASC 
+      LIMIT ?
+    
+Params: [ 'pending', 5 ]
+ GET /api/test-models 200 in 1041ms
+ GET /database-test 200 in 332ms
+ ⚠ Cross origin request detected from 8f35a07026051d8a57.blackbx.ai to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
 Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+Testing database connection...
+Testing database connection to: db5018065428.hosting-data.io
+Database connection error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+❌ Database connection failed: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+DNS Resolution Error: Cannot resolve hostname db5018065428.hosting-data.io
+Please verify:
+1. The hostname is correct
+2. You have internet connectivity
+3. The database server is accessible from this network
+Using fallback mock data for development...
+Database connection error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+Query execution error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+Query: SELECT 1 as test
+Params: []
+Database query failed, using mock data for development
+Database connection error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+Query execution error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+Query: SHOW TABLES
+Params: []
+Database query failed, using mock data for development
+Database connection error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+Query execution error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+Query: SELECT DATABASE() as current_db, VERSION() as version
+Params: []
+Database query failed, using mock data for development
+ GET /api/test-db 200 in 109ms
+🚀 Starting database migration via API...
+Testing database connection to: db5018065428.hosting-data.io
+Database connection error: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+❌ Database connection failed: [Error: getaddrinfo ENOTFOUND db5018065428.hosting-data.io] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'db5018065428.hosting-data.io',
+  fatal: true
+}
+DNS Resolution Error: Cannot resolve hostname db5018065428.hosting-data.io
+Please verify:
+1. The hostname is correct
+2. You have internet connectivity
+3. The database server is accessible from this network
+Database connection failed, simulating migration for development...
+ POST /api/migrate 200 in 97ms
