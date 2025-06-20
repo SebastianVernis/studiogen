@@ -1,4 +1,3 @@
-// Google AI Direct Provider Configuration
 export interface GenerateImageInput {
   prompt: string;
 }
