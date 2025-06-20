@@ -43,3 +43,8 @@ next-env.d.ts
 # firebase
 firebase-debug.log
 firestore-debug.logserver.log
+
+# Offline deployment artifacts
+node_modules.tar.gz
+offline_cache/
+.next/
