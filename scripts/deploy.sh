@@ -9,8 +9,8 @@ set -e
 PROJECT_NAME="studiogen"
 DEFAULT_ENVIRONMENT="prod"
 DEFAULT_BRANCH="main"
-APP_DIR="$PROJECT_NAME/src/app"
-BACKUP_DIR="$PROJECT_NAME/backups"
+APP_DIR="./src/app"
+BACKUP_DIR="./backups"
 LOG_DIR="$PROJECT_NAME"
 
 # Colores para output
