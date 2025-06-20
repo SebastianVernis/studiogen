@@ -9,7 +9,7 @@ set -e
 PROJECT_NAME="studiogen"
 DEFAULT_ENVIRONMENT="prod"
 DEFAULT_BRANCH="main"
-APP_DIR="/var/www/$PROJECT_NAME/app"
+APP_DIR="/var/www/$PROJECT_NAME/src/app"
 BACKUP_DIR="/var/www/$PROJECT_NAME/backups"
 LOG_DIR="/var/log/$PROJECT_NAME"
 
