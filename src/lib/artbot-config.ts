@@ -4,6 +4,81 @@ export const MAX_PROCESSING_JOBS = 10;
 export const TITLE_WORD_THRESHOLD = 6;
 export const DOWNLOAD_DELAY_MS = 1500;
 
+// AI Provider Configuration
+export interface AIProvider {
+  id: string;
+  name: string;
+  type: 'openai' | 'anthropic' | 'google' | 'cohere';
+  models: AIModel[];
+  requiresApiKey: boolean;
+  supportsImageGeneration: boolean;
+  supportsTextGeneration: boolean;
+}
+
+export interface AIModel {
+  id: string;
+  name: string;
+  type: 'text' | 'image' | 'multimodal';
+  maxTokens?: number;
+}
+
+export const AI_PROVIDERS: AIProvider[] = [
+  {
+    id: 'google',
+    name: 'Google Gemini',
+    type: 'google',
+    models: [
+      { id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash Experimental', type: 'multimodal' },
+      { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', type: 'multimodal' },
+      { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', type: 'multimodal' }
+    ],
+    requiresApiKey: true,
+    supportsImageGeneration: true,
+    supportsTextGeneration: true
+  },
+  {
+    id: 'openai',
+    name: 'OpenAI',
+    type: 'openai',
+    models: [
+      { id: 'gpt-4o', name: 'GPT-4o', type: 'multimodal' },
+      { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', type: 'text' },
+      { id: 'dall-e-3', name: 'DALL-E 3', type: 'image' }
+    ],
+    requiresApiKey: true,
+    supportsImageGeneration: true,
+    supportsTextGeneration: true
+  },
+  {
+    id: 'anthropic',
+    name: 'Anthropic Claude',
+    type: 'anthropic',
+    models: [
+      { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', type: 'multimodal' },
+      { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus', type: 'multimodal' },
+      { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', type: 'text' }
+    ],
+    requiresApiKey: true,
+    supportsImageGeneration: false,
+    supportsTextGeneration: true
+  },
+  {
+    id: 'cohere',
+    name: 'Cohere',
+    type: 'cohere',
+    models: [
+      { id: 'command-r-plus', name: 'Command R+', type: 'text' },
+      { id: 'command-r', name: 'Command R', type: 'text' }
+    ],
+    requiresApiKey: true,
+    supportsImageGeneration: false,
+    supportsTextGeneration: true
+  }
+];
+
+export const DEFAULT_AI_PROVIDER = 'google';
+export const DEFAULT_AI_MODEL = 'gemini-2.0-flash-exp';
+
 export interface ArtStyle {
   name: string;
   value: string;
