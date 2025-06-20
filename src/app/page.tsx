@@ -5,10 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Sparkles, Image as ImageIcon, Loader2, AlertTriangle, Send, ListChecks, Info, MessageSquareText, Type, Download, Link as LinkIcon, Palette, PlusCircle, PlayCircle, Lock, LogIn, Smile, Heart, Cpu, CircuitBoard, Music2, Disc3, ActivitySquare, Ban, AlertOctagon, Code2, DollarSign, Landmark, CreditCard, Shield, ShieldCheck, LogOut, Menu as MenuIcon, Moon, Sun, GlobeLock, CheckCircle, Wand2, UploadCloud, FileArchive } from 'lucide-react';
 import FuturisticBackground from '@/components/futuristic-background';
 import { artStyles, MAX_PROMPTS_OVERALL, MAX_PROCESSING_JOBS, DOWNLOAD_DELAY_MS, AI_PROVIDERS, type DisplayItem, type PromptJob, type ArtStyle, type AIProvider } from '@/lib/artbot-config';
-import { generateImageFromPrompt } from '@/ai/flows/generate-image-from-prompt';
-import { refineImage } from '@/ai/flows/refine-image-flow';
-import { extractPromptsFromText } from '@/ai/flows/extract-prompts-from-text-flow';
-import { aiProviderService } from '@/ai/ai-provider-service';
+
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -339,11 +336,24 @@ const ImageGeneratorApp = () => {
         ));
 
         try {
-          const result = await generateImageFromPrompt({ 
-            prompt: currentJob.styledPrompt,
-            provider: selectedAIProvider,
-            model: selectedAIModel
+          const response = await fetch('/api/generate-image', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              prompt: currentJob.styledPrompt,
+              artStyle: currentJob.artStyleUsed,
+              provider: selectedAIProvider,
+              model: selectedAIModel
+            }),
           });
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const result = await response.json();
           const generatedImageUrl = result.imageUrl;
 
           setDisplayList(prevItems => prevItems.map(item => 
@@ -392,11 +402,24 @@ const ImageGeneratorApp = () => {
         ));
 
         try {
-          const result = await generateImageFromPrompt({ 
-            prompt: currentJob.styledPrompt,
-            provider: selectedAIProvider,
-            model: selectedAIModel
+          const response = await fetch('/api/generate-image', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              prompt: currentJob.styledPrompt,
+              artStyle: currentJob.artStyleUsed,
+              provider: selectedAIProvider,
+              model: selectedAIModel
+            }),
           });
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const result = await response.json();
           const generatedImageUrl = result.imageUrl;
 
           setAnalyzerDisplayList(prevItems => prevItems.map(item => 
@@ -912,37 +935,38 @@ const ImageGeneratorApp = () => {
                     <div className="mt-3 p-1 border-2 border-dashed border-primary/60 rounded-md bg-background/40">
                     <img src={item.imageUrl} alt={`Generado por IA para: ${item.originalPrompt} (${item.artStyleUsed})`} className="w-full h-auto rounded object-contain max-h-[40vh]" data-ai-hint="generated art" />
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                {!currentItemBeingRefinedState && !currentIsBatchProcessing && !currentIsDownloading && (
-                    <div className="flex gap-2 mt-3">
-                        <Button onClick={() => handleStartRefinement(item, forAnalyzerTab)} size="sm" variant="outline" className="border-accent text-accent hover:text-accent-foreground hover:bg-accent">
-                            <Wand2 className="mr-2 h-4 w-4" /> Mejorar
+                    {!currentItemBeingRefinedState && !currentIsBatchProcessing && !currentIsDownloading && (
+                        <div className="flex gap-2 mt-3">
+                            <Button onClick={() => handleStartRefinement(item, forAnalyzerTab)} size="sm" variant="outline" className="border-accent text-accent hover:text-accent-foreground hover:bg-accent">
+                                <Wand2 className="mr-2 h-4 w-4" /> Mejorar
+                            </Button>
+                        </div>
+                    )}
+                    {currentItemBeingRefinedState?.id === item.id && (
+                    <div className="mt-4 p-3 border border-dashed border-accent/70 rounded-lg bg-card/50">
+                        <Label htmlFor={`refine-${item.id}-${forAnalyzerTab}`} className="text-sm font-medium text-accent flex items-center mb-2">
+                        <Wand2 size={16} className="mr-2"/> Prompt de Mejora:
+                        </Label>
+                        <Textarea
+                        id={`refine-${item.id}-${forAnalyzerTab}`}
+                        value={currentRefinementTextState}
+                        onChange={(e) => setRefinementTextState(e.target.value)}
+                        placeholder="Ej: hacerlo más oscuro, añadir un gato, cambiar el color del cielo..."
+                        rows={2}
+                        className="my-2 bg-background/70 border-accent/50 focus-visible:border-accent"
+                        disabled={isCurrentlySubmittingRefinement}
+                        />
+                        <div className="flex gap-2 mt-2">
+                        <Button onClick={() => handleSubmitRefinement(forAnalyzerTab)} size="sm" disabled={isCurrentlySubmittingRefinement || !currentRefinementTextState.trim()} className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                            {isCurrentlySubmittingRefinement ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : <Send className="mr-2 h-4 w-4" />} Aplicar Mejora
                         </Button>
+                        <Button onClick={() => handleCancelRefinement(forAnalyzerTab)} size="sm" variant="ghost" disabled={isCurrentlySubmittingRefinement}>
+                            Cancelar
+                        </Button>
+                        </div>
                     </div>
-                )}
-                {currentItemBeingRefinedState?.id === item.id && (
-                <div className="mt-4 p-3 border border-dashed border-accent/70 rounded-lg bg-card/50">
-                    <Label htmlFor={`refine-${item.id}-${forAnalyzerTab}`} className="text-sm font-medium text-accent flex items-center mb-2">
-                    <Wand2 size={16} className="mr-2"/> Prompt de Mejora:
-                    </Label>
-                    <Textarea
-                    id={`refine-${item.id}-${forAnalyzerTab}`}
-                    value={currentRefinementTextState}
-                    onChange={(e) => setRefinementTextState(e.target.value)}
-                    placeholder="Ej: hacerlo más oscuro, añadir un gato, cambiar el color del cielo..."
-                    rows={2}
-                    className="my-2 bg-background/70 border-accent/50 focus-visible:border-accent"
-                    disabled={isCurrentlySubmittingRefinement}
-                    />
-                    <div className="flex gap-2 mt-2">
-                    <Button onClick={() => handleSubmitRefinement(forAnalyzerTab)} size="sm" disabled={isCurrentlySubmittingRefinement || !currentRefinementTextState.trim()} className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                        {isCurrentlySubmittingRefinement ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : <Send className="mr-2 h-4 w-4" />} Aplicar Mejora
-                    </Button>
-                    <Button onClick={() => handleCancelRefinement(forAnalyzerTab)} size="sm" variant="ghost" disabled={isCurrentlySubmittingRefinement}>
-                        Cancelar
-                    </Button>
-                    </div>
-                </div>
+                    )}
+                </>
                 )}
             </div>
             )}

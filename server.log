@@ -1,10 +1,10 @@
 
 > nextn@0.1.0 dev
-> next dev --turbopack -p 9002 --hostname 0.0.0.0
+> next dev --turbopack -p 9002
 
    ▲ Next.js 15.3.3 (Turbopack)
    - Local:        http://localhost:9002
-   - Network:      http://0.0.0.0:9002
+   - Network:      http://169.254.0.21:9002
 
  ✓ Starting...
 Attention: Next.js now collects completely anonymous telemetry regarding usage.
@@ -12,10 +12,1127 @@ This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
- ✓ Ready in 1495ms
+ ✓ Ready in 1420ms
  ○ Compiling / ...
- ✓ Compiled / in 12.2s
- HEAD / 200 in 13940ms
- GET / 200 in 275ms
- ⚠ Cross origin request detected from ab748bb3371130dd9f.blackbx.ai to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
-Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ ✓ Compiled / in 3s
+ ⨯ ./src/app/page.tsx:858:10
+Parsing ecmascript source code failed
+[0m [90m 856 |[39m[0m
+[0m [90m 857 |[39m     [36mreturn[39m ([0m
+[0m[31m[1m>[22m[39m[90m 858 |[39m         [33m<[39m[33mdiv[39m key[33m=[39m{item[33m.[39mid} className[33m=[39m[32m"p-4 rounded-lg bg-card/75 border border-primary/70 shadow-md relative"[39m[33m>[39m[0m
+[0m [90m     |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 859 |[39m             [33m<[39m[33mspan[39m className[33m=[39m[32m"absolute top-2 right-2 text-xs bg-primary/20 text-primary font-bold px-2 py-1 rounded-full"[39m[33m>[39m[33m#[39m{index [33m+[39m [35m1[39m}[33m<[39m[33m/[39m[33mspan[39m[33m>[39m[0m
+[0m [90m 860 |[39m             {item[33m.[39mtype [33m===[39m [32m'title_comment'[39m [33m&&[39m ( [0m
+[0m [90m 861 |[39m             [33m<[39m[33mdiv[39m className[33m=[39m[32m"flex items-center"[39m[33m>[39m[0m
+
+Unexpected token `div`. Expected jsx identifier
+
+
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1696ms
+ HEAD / 500 in 5013ms
+ ⨯ ./src/app/page.tsx:858:10
+Parsing ecmascript source code failed
+[0m [90m 856 |[39m[0m
+[0m [90m 857 |[39m     [36mreturn[39m ([0m
+[0m[31m[1m>[22m[39m[90m 858 |[39m         [33m<[39m[33mdiv[39m key[33m=[39m{item[33m.[39mid} className[33m=[39m[32m"p-4 rounded-lg bg-card/75 border border-primary/70 shadow-md relative"[39m[33m>[39m[0m
+[0m [90m     |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 859 |[39m             [33m<[39m[33mspan[39m className[33m=[39m[32m"absolute top-2 right-2 text-xs bg-primary/20 text-primary font-bold px-2 py-1 rounded-full"[39m[33m>[39m[33m#[39m{index [33m+[39m [35m1[39m}[33m<[39m[33m/[39m[33mspan[39m[33m>[39m[0m
+[0m [90m 860 |[39m             {item[33m.[39mtype [33m===[39m [32m'title_comment'[39m [33m&&[39m ( [0m
+[0m [90m 861 |[39m             [33m<[39m[33mdiv[39m className[33m=[39m[32m"flex items-center"[39m[33m>[39m[0m
+
+Unexpected token `div`. Expected jsx identifier
+
+
+ HEAD / 500 in 145ms
+ ⨯ ./node_modules/@opentelemetry/sdk-trace-node/node_modules/@opentelemetry/context-async-hooks/build/src/AsyncHooksContextManager.js:20:20
+Module not found: Can't resolve 'async_hooks'
+[0m [90m 18 |[39m exports[33m.[39m[33mAsyncHooksContextManager[39m [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m [90m 19 |[39m [36mconst[39m api_1 [33m=[39m require([32m"@opentelemetry/api"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 20 |[39m [36mconst[39m asyncHooks [33m=[39m require([32m"async_hooks"[39m)[33m;[39m[0m
+[0m [90m    |[39m                    [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 21 |[39m [36mconst[39m [33mAbstractAsyncHooksContextManager_1[39m [33m=[39m require([32m"./AbstractAsyncHooksContextManager"[39m)[33m;[39m[0m
+[0m [90m 22 |[39m [36mclass[39m [33mAsyncHooksContextManager[39m [36mextends[39m [33mAbstractAsyncHooksContextManager_1[39m[33m.[39m[33mAbstractAsyncHooksContextManager[39m {[0m
+[0m [90m 23 |[39m     constructor() {[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@opentelemetry/sdk-trace-node/node_modules/@opentelemetry/context-async-hooks/build/src/AsyncLocalStorageContextManager.js:20:23
+Module not found: Can't resolve 'async_hooks'
+[0m [90m 18 |[39m exports[33m.[39m[33mAsyncLocalStorageContextManager[39m [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m [90m 19 |[39m [36mconst[39m api_1 [33m=[39m require([32m"@opentelemetry/api"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 20 |[39m [36mconst[39m async_hooks_1 [33m=[39m require([32m"async_hooks"[39m)[33m;[39m[0m
+[0m [90m    |[39m                       [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 21 |[39m [36mconst[39m [33mAbstractAsyncHooksContextManager_1[39m [33m=[39m require([32m"./AbstractAsyncHooksContextManager"[39m)[33m;[39m[0m
+[0m [90m 22 |[39m [36mclass[39m [33mAsyncLocalStorageContextManager[39m [36mextends[39m [33mAbstractAsyncHooksContextManager_1[39m[33m.[39m[33mAbstractAsyncHooksContextManager[39m {[0m
+[0m [90m 23 |[39m     constructor() {[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/grpc-js/build/src/resolver-dns.js:21:15
+Module not found: Can't resolve 'dns'
+[0m [90m 19 |[39m exports[33m.[39msetup [33m=[39m setup[33m;[39m[0m
+[0m [90m 20 |[39m [36mconst[39m resolver_1 [33m=[39m require([32m"./resolver"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 21 |[39m [36mconst[39m dns_1 [33m=[39m require([32m"dns"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 22 |[39m [36mconst[39m service_config_1 [33m=[39m require([32m"./service-config"[39m)[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m [90m 24 |[39m [36mconst[39m metadata_1 [33m=[39m require([32m"./metadata"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@genkit-ai/ai/lib/prompt.js:35:17
+Module not found: Can't resolve 'fs'
+[0m [90m 33 |[39m [36mvar[39m import_logging [33m=[39m require([32m"@genkit-ai/core/logging"[39m)[33m;[39m[0m
+[0m [90m 34 |[39m [36mvar[39m import_schema [33m=[39m require([32m"@genkit-ai/core/schema"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 35 |[39m [36mvar[39m import_fs [33m=[39m require([32m"fs"[39m)[33m;[39m[0m
+[0m [90m    |[39m                 [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 36 |[39m [36mvar[39m import_path [33m=[39m require([32m"path"[39m)[33m;[39m[0m
+[0m [90m 37 |[39m [36mvar[39m import_generate [33m=[39m require([32m"./generate.js"[39m)[33m;[39m[0m
+[0m [90m 38 |[39m [36mvar[39m import_message [33m=[39m require([32m"./message.js"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@google/generative-ai/dist/server/index.js:3:10
+Module not found: Can't resolve 'fs'
+[0m [90m 1 |[39m [32m'use strict'[39m[33m;[39m[0m
+[0m [90m 2 |[39m[0m
+[0m[31m[1m>[22m[39m[90m 3 |[39m [36mvar[39m fs [33m=[39m require([32m'fs'[39m)[33m;[39m[0m
+[0m [90m   |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 4 |[39m[0m
+[0m [90m 5 |[39m [90m/**[39m[0m
+[0m [90m 6 |[39m [90m * @license[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/grpc-js/build/src/certificate-provider.js:20:12
+Module not found: Can't resolve 'fs'
+[0m [90m 18 |[39m [33mObject[39m[33m.[39mdefineProperty(exports[33m,[39m [32m"__esModule"[39m[33m,[39m { value[33m:[39m [36mtrue[39m })[33m;[39m[0m
+[0m [90m 19 |[39m exports[33m.[39m[33mFileWatcherCertificateProvider[39m [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 20 |[39m [36mconst[39m fs [33m=[39m require([32m"fs"[39m)[33m;[39m[0m
+[0m [90m    |[39m            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 21 |[39m [36mconst[39m logging [33m=[39m require([32m"./logging"[39m)[33m;[39m[0m
+[0m [90m 22 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m util_1 [33m=[39m require([32m"util"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/grpc-js/build/src/tls-helpers.js:21:12
+Module not found: Can't resolve 'fs'
+[0m [90m 19 |[39m exports[33m.[39m[33mCIPHER_SUITES[39m [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m [90m 20 |[39m exports[33m.[39mgetDefaultRootsData [33m=[39m getDefaultRootsData[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 21 |[39m [36mconst[39m fs [33m=[39m require([32m"fs"[39m)[33m;[39m[0m
+[0m [90m    |[39m            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 22 |[39m exports[33m.[39m[33mCIPHER_SUITES[39m [33m=[39m process[33m.[39menv[33m.[39m[33mGRPC_SSL_CIPHER_SUITES[39m[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m [33mDEFAULT_ROOTS_FILE_PATH[39m [33m=[39m process[33m.[39menv[33m.[39m[33mGRPC_DEFAULT_SSL_ROOTS_FILE_PATH[39m[33m;[39m[0m
+[0m [90m 24 |[39m [36mlet[39m defaultRootsData [33m=[39m [36mnull[39m[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/proto-loader/build/src/util.js:21:12
+Module not found: Can't resolve 'fs'
+[0m [90m 19 |[39m [33mObject[39m[33m.[39mdefineProperty(exports[33m,[39m [32m"__esModule"[39m[33m,[39m { value[33m:[39m [36mtrue[39m })[33m;[39m[0m
+[0m [90m 20 |[39m exports[33m.[39maddCommonProtos [33m=[39m exports[33m.[39mloadProtosWithOptionsSync [33m=[39m exports[33m.[39mloadProtosWithOptions [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 21 |[39m [36mconst[39m fs [33m=[39m require([32m"fs"[39m)[33m;[39m[0m
+[0m [90m    |[39m            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 22 |[39m [36mconst[39m path [33m=[39m require([32m"path"[39m)[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m [33mProtobuf[39m [33m=[39m require([32m"protobufjs"[39m)[33m;[39m[0m
+[0m [90m 24 |[39m [36mfunction[39m addIncludePathResolver(root[33m,[39m includePaths) {[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@opentelemetry/otlp-grpc-exporter-base/build/src/util.js:23:12
+Module not found: Can't resolve 'fs'
+[0m [90m 21 |[39m [36mconst[39m path [33m=[39m require([32m"path"[39m)[33m;[39m[0m
+[0m [90m 22 |[39m [36mconst[39m url_1 [33m=[39m require([32m"url"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 23 |[39m [36mconst[39m fs [33m=[39m require([32m"fs"[39m)[33m;[39m[0m
+[0m [90m    |[39m            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 24 |[39m [36mconst[39m otlp_exporter_base_1 [33m=[39m require([32m"@opentelemetry/otlp-exporter-base"[39m)[33m;[39m[0m
+[0m [90m 25 |[39m [36mconst[39m grpc_exporter_transport_1 [33m=[39m require([32m"./grpc-exporter-transport"[39m)[33m;[39m[0m
+[0m [90m 26 |[39m exports[33m.[39m[33mDEFAULT_COLLECTOR_URL[39m [33m=[39m [32m'http://localhost:4317'[39m[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/destroy/index.js:16:18
+Module not found: Can't resolve 'fs'
+[0m [90m 14 |[39m[0m
+[0m [90m 15 |[39m [36mvar[39m [33mEventEmitter[39m [33m=[39m require([32m'events'[39m)[33m.[39m[33mEventEmitter[39m[0m
+[0m[31m[1m>[22m[39m[90m 16 |[39m [36mvar[39m [33mReadStream[39m [33m=[39m require([32m'fs'[39m)[33m.[39m[33mReadStream[39m[0m
+[0m [90m    |[39m                  [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 17 |[39m [36mvar[39m [33mStream[39m [33m=[39m require([32m'stream'[39m)[0m
+[0m [90m 18 |[39m [36mvar[39m [33mZlib[39m [33m=[39m require([32m'zlib'[39m)[0m
+[0m [90m 19 |[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/etag/index.js:22:13
+Module not found: Can't resolve 'fs'
+[0m [90m 20 |[39m[0m
+[0m [90m 21 |[39m [36mvar[39m crypto [33m=[39m require([32m'crypto'[39m)[0m
+[0m[31m[1m>[22m[39m[90m 22 |[39m [36mvar[39m [33mStats[39m [33m=[39m require([32m'fs'[39m)[33m.[39m[33mStats[39m[0m
+[0m [90m    |[39m             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 23 |[39m[0m
+[0m [90m 24 |[39m [90m/**[39m[0m
+[0m [90m 25 |[39m [90m * Module variables.[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/express/lib/view.js:18:10
+Module not found: Can't resolve 'fs'
+[0m [90m 16 |[39m [36mvar[39m debug [33m=[39m require([32m'debug'[39m)([32m'express:view'[39m)[33m;[39m[0m
+[0m [90m 17 |[39m [36mvar[39m path [33m=[39m require([32m'path'[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 18 |[39m [36mvar[39m fs [33m=[39m require([32m'fs'[39m)[33m;[39m[0m
+[0m [90m    |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 19 |[39m[0m
+[0m [90m 20 |[39m [90m/**[39m[0m
+[0m [90m 21 |[39m [90m * Module variables.[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/mime/mime.js:2:10
+Module not found: Can't resolve 'fs'
+[0m [90m 1 |[39m [36mvar[39m path [33m=[39m require([32m'path'[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 2 |[39m [36mvar[39m fs [33m=[39m require([32m'fs'[39m)[33m;[39m[0m
+[0m [90m   |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 3 |[39m[0m
+[0m [90m 4 |[39m [36mfunction[39m [33mMime[39m() {[0m
+[0m [90m 5 |[39m   [90m// Map of extension -> mime type[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/send/index.js:23:10
+Module not found: Can't resolve 'fs'
+[0m [90m 21 |[39m [36mvar[39m etag [33m=[39m require([32m'etag'[39m)[0m
+[0m [90m 22 |[39m [36mvar[39m fresh [33m=[39m require([32m'fresh'[39m)[0m
+[0m[31m[1m>[22m[39m[90m 23 |[39m [36mvar[39m fs [33m=[39m require([32m'fs'[39m)[0m
+[0m [90m    |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 24 |[39m [36mvar[39m mime [33m=[39m require([32m'mime'[39m)[0m
+[0m [90m 25 |[39m [36mvar[39m ms [33m=[39m require([32m'ms'[39m)[0m
+[0m [90m 26 |[39m [36mvar[39m onFinished [33m=[39m require([32m'on-finished'[39m)[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@genkit-ai/core/lib/reflection.js:36:31
+Module not found: Can't resolve 'fs/promises'
+[0m [90m 34 |[39m module[33m.[39mexports [33m=[39m __toCommonJS(reflection_exports)[33m;[39m[0m
+[0m [90m 35 |[39m [36mvar[39m import_express [33m=[39m __toESM(require([32m"express"[39m))[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 36 |[39m [36mvar[39m import_promises [33m=[39m __toESM(require([32m"fs/promises"[39m))[33m;[39m[0m
+[0m [90m    |[39m                               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 37 |[39m [36mvar[39m import_get_port [33m=[39m __toESM(require([32m"get-port"[39m))[33m;[39m[0m
+[0m [90m 38 |[39m [36mvar[39m import_path [33m=[39m __toESM(require([32m"path"[39m))[33m;[39m[0m
+[0m [90m 39 |[39m [36mvar[39m z [33m=[39m __toESM(require([32m"zod"[39m))[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/grpc-js/build/src/load-balancing-call.js:28:15
+Module not found: Can't resolve 'http2'
+[0m [90m 26 |[39m [36mconst[39m logging [33m=[39m require([32m"./logging"[39m)[33m;[39m[0m
+[0m [90m 27 |[39m [36mconst[39m control_plane_status_1 [33m=[39m require([32m"./control-plane-status"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 28 |[39m [36mconst[39m http2 [33m=[39m require([32m"http2"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 29 |[39m [36mconst[39m [33mTRACER_NAME[39m [33m=[39m [32m'load_balancing_call'[39m[33m;[39m[0m
+[0m [90m 30 |[39m [36mclass[39m [33mLoadBalancingCall[39m {[0m
+[0m [90m 31 |[39m     constructor(channel[33m,[39m callConfig[33m,[39m methodName[33m,[39m host[33m,[39m credentials[33m,[39m deadline[33m,[39m callNumber) {[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/grpc-js/build/src/server-interceptors.js:24:15
+Module not found: Can't resolve 'http2'
+[0m [90m 22 |[39m [36mconst[39m metadata_1 [33m=[39m require([32m"./metadata"[39m)[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 24 |[39m [36mconst[39m http2 [33m=[39m require([32m"http2"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 25 |[39m [36mconst[39m error_1 [33m=[39m require([32m"./error"[39m)[33m;[39m[0m
+[0m [90m 26 |[39m [36mconst[39m zlib [33m=[39m require([32m"zlib"[39m)[33m;[39m[0m
+[0m [90m 27 |[39m [36mconst[39m stream_decoder_1 [33m=[39m require([32m"./stream-decoder"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/grpc-js/build/src/server.js:54:15
+Module not found: Can't resolve 'http2'
+[0m [90m 52 |[39m [33mObject[39m[33m.[39mdefineProperty(exports[33m,[39m [32m"__esModule"[39m[33m,[39m { value[33m:[39m [36mtrue[39m })[33m;[39m[0m
+[0m [90m 53 |[39m exports[33m.[39m[33mServer[39m [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 54 |[39m [36mconst[39m http2 [33m=[39m require([32m"http2"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 55 |[39m [36mconst[39m util [33m=[39m require([32m"util"[39m)[33m;[39m[0m
+[0m [90m 56 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m [90m 57 |[39m [36mconst[39m server_call_1 [33m=[39m require([32m"./server-call"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/grpc-js/build/src/subchannel-call.js:20:15
+Module not found: Can't resolve 'http2'
+[0m [90m 18 |[39m [33mObject[39m[33m.[39mdefineProperty(exports[33m,[39m [32m"__esModule"[39m[33m,[39m { value[33m:[39m [36mtrue[39m })[33m;[39m[0m
+[0m [90m 19 |[39m exports[33m.[39m[33mHttp2SubchannelCall[39m [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 20 |[39m [36mconst[39m http2 [33m=[39m require([32m"http2"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 21 |[39m [36mconst[39m os [33m=[39m require([32m"os"[39m)[33m;[39m[0m
+[0m [90m 22 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m metadata_1 [33m=[39m require([32m"./metadata"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/grpc-js/build/src/transport.js:20:15
+Module not found: Can't resolve 'http2'
+[0m [90m 18 |[39m [33mObject[39m[33m.[39mdefineProperty(exports[33m,[39m [32m"__esModule"[39m[33m,[39m { value[33m:[39m [36mtrue[39m })[33m;[39m[0m
+[0m [90m 19 |[39m exports[33m.[39m[33mHttp2SubchannelConnector[39m [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 20 |[39m [36mconst[39m http2 [33m=[39m require([32m"http2"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 21 |[39m [36mconst[39m channelz_1 [33m=[39m require([32m"./channelz"[39m)[33m;[39m[0m
+[0m [90m 22 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m http_proxy_1 [33m=[39m require([32m"./http_proxy"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/grpc-js/build/src/channelz.js:24:15
+Module not found: Can't resolve 'net'
+[0m [90m 22 |[39m exports[33m.[39mgetChannelzServiceDefinition [33m=[39m getChannelzServiceDefinition[33m;[39m[0m
+[0m [90m 23 |[39m exports[33m.[39msetup [33m=[39m setup[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 24 |[39m [36mconst[39m net_1 [33m=[39m require([32m"net"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 25 |[39m [36mconst[39m ordered_map_1 [33m=[39m require([32m"@js-sdsl/ordered-map"[39m)[33m;[39m[0m
+[0m [90m 26 |[39m [36mconst[39m connectivity_state_1 [33m=[39m require([32m"./connectivity-state"[39m)[33m;[39m[0m
+[0m [90m 27 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/grpc-js/build/src/http_proxy.js:24:15
+Module not found: Can't resolve 'net'
+[0m [90m 22 |[39m [36mconst[39m logging_1 [33m=[39m require([32m"./logging"[39m)[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 24 |[39m [36mconst[39m net_1 [33m=[39m require([32m"net"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 25 |[39m [36mconst[39m http [33m=[39m require([32m"http"[39m)[33m;[39m[0m
+[0m [90m 26 |[39m [36mconst[39m logging [33m=[39m require([32m"./logging"[39m)[33m;[39m[0m
+[0m [90m 27 |[39m [36mconst[39m subchannel_address_1 [33m=[39m require([32m"./subchannel-address"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/grpc-js/build/src/load-balancer-pick-first.js:29:15
+Module not found: Can't resolve 'net'
+[0m [90m 27 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m [90m 28 |[39m [36mconst[39m subchannel_address_2 [33m=[39m require([32m"./subchannel-address"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 29 |[39m [36mconst[39m net_1 [33m=[39m require([32m"net"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 30 |[39m [36mconst[39m [33mTRACER_NAME[39m [33m=[39m [32m'pick_first'[39m[33m;[39m[0m
+[0m [90m 31 |[39m [36mfunction[39m trace(text) {[0m
+[0m [90m 32 |[39m     logging[33m.[39mtrace(constants_1[33m.[39m[33mLogVerbosity[39m[33m.[39m[33mDEBUG[39m[33m,[39m [33mTRACER_NAME[39m[33m,[39m text)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/grpc-js/build/src/resolver-dns.js:28:15
+Module not found: Can't resolve 'net'
+[0m [90m 26 |[39m [36mconst[39m constants_2 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m [90m 27 |[39m [36mconst[39m uri_parser_1 [33m=[39m require([32m"./uri-parser"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 28 |[39m [36mconst[39m net_1 [33m=[39m require([32m"net"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 29 |[39m [36mconst[39m backoff_timeout_1 [33m=[39m require([32m"./backoff-timeout"[39m)[33m;[39m[0m
+[0m [90m 30 |[39m [36mconst[39m environment_1 [33m=[39m require([32m"./environment"[39m)[33m;[39m[0m
+[0m [90m 31 |[39m [36mconst[39m [33mTRACER_NAME[39m [33m=[39m [32m'dns_resolver'[39m[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/grpc-js/build/src/resolver-ip.js:19:15
+Module not found: Can't resolve 'net'
+[0m [90m 17 |[39m [33mObject[39m[33m.[39mdefineProperty(exports[33m,[39m [32m"__esModule"[39m[33m,[39m { value[33m:[39m [36mtrue[39m })[33m;[39m[0m
+[0m [90m 18 |[39m exports[33m.[39msetup [33m=[39m setup[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 19 |[39m [36mconst[39m net_1 [33m=[39m require([32m"net"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 20 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m [90m 21 |[39m [36mconst[39m metadata_1 [33m=[39m require([32m"./metadata"[39m)[33m;[39m[0m
+[0m [90m 22 |[39m [36mconst[39m resolver_1 [33m=[39m require([32m"./resolver"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/grpc-js/build/src/subchannel-address.js:27:15
+Module not found: Can't resolve 'net'
+[0m [90m 25 |[39m exports[33m.[39mendpointToString [33m=[39m endpointToString[33m;[39m[0m
+[0m [90m 26 |[39m exports[33m.[39mendpointHasAddress [33m=[39m endpointHasAddress[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 27 |[39m [36mconst[39m net_1 [33m=[39m require([32m"net"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 28 |[39m [36mfunction[39m isTcpSubchannelAddress(address) {[0m
+[0m [90m 29 |[39m     [36mreturn[39m [32m'port'[39m [36min[39m address[33m;[39m[0m
+[0m [90m 30 |[39m }[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/grpc-js/build/src/transport.js:28:13
+Module not found: Can't resolve 'net'
+[0m [90m 26 |[39m [36mconst[39m subchannel_address_1 [33m=[39m require([32m"./subchannel-address"[39m)[33m;[39m[0m
+[0m [90m 27 |[39m [36mconst[39m uri_parser_1 [33m=[39m require([32m"./uri-parser"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 28 |[39m [36mconst[39m net [33m=[39m require([32m"net"[39m)[33m;[39m[0m
+[0m [90m    |[39m             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 29 |[39m [36mconst[39m subchannel_call_1 [33m=[39m require([32m"./subchannel-call"[39m)[33m;[39m[0m
+[0m [90m 30 |[39m [36mconst[39m call_number_1 [33m=[39m require([32m"./call-number"[39m)[33m;[39m[0m
+[0m [90m 31 |[39m [36mconst[39m [33mTRACER_NAME[39m [33m=[39m [32m'transport'[39m[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/express/lib/request.js:18:12
+Module not found: Can't resolve 'net'
+[0m [90m 16 |[39m [36mvar[39m accepts [33m=[39m require([32m'accepts'[39m)[33m;[39m[0m
+[0m [90m 17 |[39m [36mvar[39m deprecate [33m=[39m require([32m'depd'[39m)([32m'express'[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 18 |[39m [36mvar[39m isIP [33m=[39m require([32m'net'[39m)[33m.[39misIP[33m;[39m[0m
+[0m [90m    |[39m            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 19 |[39m [36mvar[39m typeis [33m=[39m require([32m'type-is'[39m)[33m;[39m[0m
+[0m [90m 20 |[39m [36mvar[39m http [33m=[39m require([32m'http'[39m)[33m;[39m[0m
+[0m [90m 21 |[39m [36mvar[39m fresh [33m=[39m require([32m'fresh'[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/get-port/index.js:2:13
+Module not found: Can't resolve 'net'
+[0m [90m 1 |[39m [32m'use strict'[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 2 |[39m [36mconst[39m net [33m=[39m require([32m'net'[39m)[33m;[39m[0m
+[0m [90m   |[39m             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 3 |[39m[0m
+[0m [90m 4 |[39m [36mclass[39m [33mLocked[39m [36mextends[39m [33mError[39m {[0m
+[0m [90m 5 |[39m 	constructor(port) {[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/@grpc/grpc-js/build/src/channel-credentials.js:21:15
+Module not found: Can't resolve 'tls'
+[0m [90m 19 |[39m exports[33m.[39m[33mChannelCredentials[39m [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m [90m 20 |[39m exports[33m.[39mcreateCertificateProviderChannelCredentials [33m=[39m createCertificateProviderChannelCredentials[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 21 |[39m [36mconst[39m tls_1 [33m=[39m require([32m"tls"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 22 |[39m [36mconst[39m call_credentials_1 [33m=[39m require([32m"./call-credentials"[39m)[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m tls_helpers_1 [33m=[39m require([32m"./tls-helpers"[39m)[33m;[39m[0m
+[0m [90m 24 |[39m [36mconst[39m uri_parser_1 [33m=[39m require([32m"./uri-parser"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./node_modules/express/lib/view.js:81:14
+Module not found: Can't resolve <dynamic>
+[0m [90m 79 |[39m[0m
+[0m [90m 80 |[39m     [90m// default engine export[39m[0m
+[0m[31m[1m>[22m[39m[90m 81 |[39m     [36mvar[39m fn [33m=[39m require(mod)[33m.[39m__express[0m
+[0m [90m    |[39m              [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 82 |[39m[0m
+[0m [90m 83 |[39m     [36mif[39m ([36mtypeof[39m fn [33m!==[39m [32m'function'[39m) {[0m
+[0m [90m 84 |[39m       [36mthrow[39m [36mnew[39m [33mError[39m([32m'Module "'[39m [33m+[39m mod [33m+[39m [32m'" does not provide a view engine.'[39m)[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./src/ai/flows/extract-prompts-from-text-flow.ts:54:46
+Parsing ecmascript source code failed
+[0m [90m 52 |[39m     } [36melse[39m {[0m
+[0m [90m 53 |[39m       [90m// Fallback: split by lines and clean up[39m[0m
+[0m[31m[1m>[22m[39m[90m 54 |[39m       [36mconst[39m lines [33m=[39m response[33m.[39mdata[33m.[39mtext[33m.[39msplit([32m'[39m[0m
+[0m [90m    |[39m                                              [31m[1m^[22m[39m[0m
+[0m [90m 55 |[39m [32m').filter(line => line.trim().length > 0);[39m[0m
+[0m [90m 56 |[39m       [36mreturn[39m { prompts[33m:[39m lines[33m.[39mslice([35m0[39m[33m,[39m [35m10[39m) }[33m;[39m[0m
+[0m [90m 57 |[39m     }[0m
+
+Unterminated string constant
+
+
+
+./src/ai/flows/extract-prompts-from-text-flow.ts:55:1
+Parsing ecmascript source code failed
+[0m [90m 53 |[39m       [90m// Fallback: split by lines and clean up[39m[0m
+[0m [90m 54 |[39m       [36mconst[39m lines [33m=[39m response[33m.[39mdata[33m.[39mtext[33m.[39msplit([32m'[39m[0m
+[0m[31m[1m>[22m[39m[90m 55 |[39m [32m').filter(line => line.trim().length > 0);[39m[0m
+[0m [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 56 |[39m       [36mreturn[39m { prompts[33m:[39m lines[33m.[39mslice([35m0[39m[33m,[39m [35m10[39m) }[33m;[39m[0m
+[0m [90m 57 |[39m     }[0m
+[0m [90m 58 |[39m   } [36mcatch[39m (error) {[0m
+
+Unterminated string constant
+
+
+
+./node_modules/@opentelemetry/sdk-trace-node/node_modules/@opentelemetry/context-async-hooks/build/src/AsyncHooksContextManager.js:20:20
+Module not found: Can't resolve 'async_hooks'
+[0m [90m 18 |[39m exports[33m.[39m[33mAsyncHooksContextManager[39m [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m [90m 19 |[39m [36mconst[39m api_1 [33m=[39m require([32m"@opentelemetry/api"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 20 |[39m [36mconst[39m asyncHooks [33m=[39m require([32m"async_hooks"[39m)[33m;[39m[0m
+[0m [90m    |[39m                    [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 21 |[39m [36mconst[39m [33mAbstractAsyncHooksContextManager_1[39m [33m=[39m require([32m"./AbstractAsyncHooksContextManager"[39m)[33m;[39m[0m
+[0m [90m 22 |[39m [36mclass[39m [33mAsyncHooksContextManager[39m [36mextends[39m [33mAbstractAsyncHooksContextManager_1[39m[33m.[39m[33mAbstractAsyncHooksContextManager[39m {[0m
+[0m [90m 23 |[39m     constructor() {[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@opentelemetry/sdk-trace-node/node_modules/@opentelemetry/context-async-hooks/build/src/AsyncLocalStorageContextManager.js:20:23
+Module not found: Can't resolve 'async_hooks'
+[0m [90m 18 |[39m exports[33m.[39m[33mAsyncLocalStorageContextManager[39m [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m [90m 19 |[39m [36mconst[39m api_1 [33m=[39m require([32m"@opentelemetry/api"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 20 |[39m [36mconst[39m async_hooks_1 [33m=[39m require([32m"async_hooks"[39m)[33m;[39m[0m
+[0m [90m    |[39m                       [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 21 |[39m [36mconst[39m [33mAbstractAsyncHooksContextManager_1[39m [33m=[39m require([32m"./AbstractAsyncHooksContextManager"[39m)[33m;[39m[0m
+[0m [90m 22 |[39m [36mclass[39m [33mAsyncLocalStorageContextManager[39m [36mextends[39m [33mAbstractAsyncHooksContextManager_1[39m[33m.[39m[33mAbstractAsyncHooksContextManager[39m {[0m
+[0m [90m 23 |[39m     constructor() {[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/grpc-js/build/src/resolver-dns.js:21:15
+Module not found: Can't resolve 'dns'
+[0m [90m 19 |[39m exports[33m.[39msetup [33m=[39m setup[33m;[39m[0m
+[0m [90m 20 |[39m [36mconst[39m resolver_1 [33m=[39m require([32m"./resolver"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 21 |[39m [36mconst[39m dns_1 [33m=[39m require([32m"dns"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 22 |[39m [36mconst[39m service_config_1 [33m=[39m require([32m"./service-config"[39m)[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m [90m 24 |[39m [36mconst[39m metadata_1 [33m=[39m require([32m"./metadata"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@genkit-ai/ai/lib/prompt.js:35:17
+Module not found: Can't resolve 'fs'
+[0m [90m 33 |[39m [36mvar[39m import_logging [33m=[39m require([32m"@genkit-ai/core/logging"[39m)[33m;[39m[0m
+[0m [90m 34 |[39m [36mvar[39m import_schema [33m=[39m require([32m"@genkit-ai/core/schema"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 35 |[39m [36mvar[39m import_fs [33m=[39m require([32m"fs"[39m)[33m;[39m[0m
+[0m [90m    |[39m                 [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 36 |[39m [36mvar[39m import_path [33m=[39m require([32m"path"[39m)[33m;[39m[0m
+[0m [90m 37 |[39m [36mvar[39m import_generate [33m=[39m require([32m"./generate.js"[39m)[33m;[39m[0m
+[0m [90m 38 |[39m [36mvar[39m import_message [33m=[39m require([32m"./message.js"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@google/generative-ai/dist/server/index.js:3:10
+Module not found: Can't resolve 'fs'
+[0m [90m 1 |[39m [32m'use strict'[39m[33m;[39m[0m
+[0m [90m 2 |[39m[0m
+[0m[31m[1m>[22m[39m[90m 3 |[39m [36mvar[39m fs [33m=[39m require([32m'fs'[39m)[33m;[39m[0m
+[0m [90m   |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 4 |[39m[0m
+[0m [90m 5 |[39m [90m/**[39m[0m
+[0m [90m 6 |[39m [90m * @license[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/grpc-js/build/src/certificate-provider.js:20:12
+Module not found: Can't resolve 'fs'
+[0m [90m 18 |[39m [33mObject[39m[33m.[39mdefineProperty(exports[33m,[39m [32m"__esModule"[39m[33m,[39m { value[33m:[39m [36mtrue[39m })[33m;[39m[0m
+[0m [90m 19 |[39m exports[33m.[39m[33mFileWatcherCertificateProvider[39m [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 20 |[39m [36mconst[39m fs [33m=[39m require([32m"fs"[39m)[33m;[39m[0m
+[0m [90m    |[39m            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 21 |[39m [36mconst[39m logging [33m=[39m require([32m"./logging"[39m)[33m;[39m[0m
+[0m [90m 22 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m util_1 [33m=[39m require([32m"util"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/grpc-js/build/src/tls-helpers.js:21:12
+Module not found: Can't resolve 'fs'
+[0m [90m 19 |[39m exports[33m.[39m[33mCIPHER_SUITES[39m [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m [90m 20 |[39m exports[33m.[39mgetDefaultRootsData [33m=[39m getDefaultRootsData[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 21 |[39m [36mconst[39m fs [33m=[39m require([32m"fs"[39m)[33m;[39m[0m
+[0m [90m    |[39m            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 22 |[39m exports[33m.[39m[33mCIPHER_SUITES[39m [33m=[39m process[33m.[39menv[33m.[39m[33mGRPC_SSL_CIPHER_SUITES[39m[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m [33mDEFAULT_ROOTS_FILE_PATH[39m [33m=[39m process[33m.[39menv[33m.[39m[33mGRPC_DEFAULT_SSL_ROOTS_FILE_PATH[39m[33m;[39m[0m
+[0m [90m 24 |[39m [36mlet[39m defaultRootsData [33m=[39m [36mnull[39m[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/proto-loader/build/src/util.js:21:12
+Module not found: Can't resolve 'fs'
+[0m [90m 19 |[39m [33mObject[39m[33m.[39mdefineProperty(exports[33m,[39m [32m"__esModule"[39m[33m,[39m { value[33m:[39m [36mtrue[39m })[33m;[39m[0m
+[0m [90m 20 |[39m exports[33m.[39maddCommonProtos [33m=[39m exports[33m.[39mloadProtosWithOptionsSync [33m=[39m exports[33m.[39mloadProtosWithOptions [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 21 |[39m [36mconst[39m fs [33m=[39m require([32m"fs"[39m)[33m;[39m[0m
+[0m [90m    |[39m            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 22 |[39m [36mconst[39m path [33m=[39m require([32m"path"[39m)[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m [33mProtobuf[39m [33m=[39m require([32m"protobufjs"[39m)[33m;[39m[0m
+[0m [90m 24 |[39m [36mfunction[39m addIncludePathResolver(root[33m,[39m includePaths) {[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@opentelemetry/otlp-grpc-exporter-base/build/src/util.js:23:12
+Module not found: Can't resolve 'fs'
+[0m [90m 21 |[39m [36mconst[39m path [33m=[39m require([32m"path"[39m)[33m;[39m[0m
+[0m [90m 22 |[39m [36mconst[39m url_1 [33m=[39m require([32m"url"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 23 |[39m [36mconst[39m fs [33m=[39m require([32m"fs"[39m)[33m;[39m[0m
+[0m [90m    |[39m            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 24 |[39m [36mconst[39m otlp_exporter_base_1 [33m=[39m require([32m"@opentelemetry/otlp-exporter-base"[39m)[33m;[39m[0m
+[0m [90m 25 |[39m [36mconst[39m grpc_exporter_transport_1 [33m=[39m require([32m"./grpc-exporter-transport"[39m)[33m;[39m[0m
+[0m [90m 26 |[39m exports[33m.[39m[33mDEFAULT_COLLECTOR_URL[39m [33m=[39m [32m'http://localhost:4317'[39m[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/destroy/index.js:16:18
+Module not found: Can't resolve 'fs'
+[0m [90m 14 |[39m[0m
+[0m [90m 15 |[39m [36mvar[39m [33mEventEmitter[39m [33m=[39m require([32m'events'[39m)[33m.[39m[33mEventEmitter[39m[0m
+[0m[31m[1m>[22m[39m[90m 16 |[39m [36mvar[39m [33mReadStream[39m [33m=[39m require([32m'fs'[39m)[33m.[39m[33mReadStream[39m[0m
+[0m [90m    |[39m                  [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 17 |[39m [36mvar[39m [33mStream[39m [33m=[39m require([32m'stream'[39m)[0m
+[0m [90m 18 |[39m [36mvar[39m [33mZlib[39m [33m=[39m require([32m'zlib'[39m)[0m
+[0m [90m 19 |[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/etag/index.js:22:13
+Module not found: Can't resolve 'fs'
+[0m [90m 20 |[39m[0m
+[0m [90m 21 |[39m [36mvar[39m crypto [33m=[39m require([32m'crypto'[39m)[0m
+[0m[31m[1m>[22m[39m[90m 22 |[39m [36mvar[39m [33mStats[39m [33m=[39m require([32m'fs'[39m)[33m.[39m[33mStats[39m[0m
+[0m [90m    |[39m             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 23 |[39m[0m
+[0m [90m 24 |[39m [90m/**[39m[0m
+[0m [90m 25 |[39m [90m * Module variables.[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/express/lib/view.js:18:10
+Module not found: Can't resolve 'fs'
+[0m [90m 16 |[39m [36mvar[39m debug [33m=[39m require([32m'debug'[39m)([32m'express:view'[39m)[33m;[39m[0m
+[0m [90m 17 |[39m [36mvar[39m path [33m=[39m require([32m'path'[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 18 |[39m [36mvar[39m fs [33m=[39m require([32m'fs'[39m)[33m;[39m[0m
+[0m [90m    |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 19 |[39m[0m
+[0m [90m 20 |[39m [90m/**[39m[0m
+[0m [90m 21 |[39m [90m * Module variables.[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/mime/mime.js:2:10
+Module not found: Can't resolve 'fs'
+[0m [90m 1 |[39m [36mvar[39m path [33m=[39m require([32m'path'[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 2 |[39m [36mvar[39m fs [33m=[39m require([32m'fs'[39m)[33m;[39m[0m
+[0m [90m   |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 3 |[39m[0m
+[0m [90m 4 |[39m [36mfunction[39m [33mMime[39m() {[0m
+[0m [90m 5 |[39m   [90m// Map of extension -> mime type[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/send/index.js:23:10
+Module not found: Can't resolve 'fs'
+[0m [90m 21 |[39m [36mvar[39m etag [33m=[39m require([32m'etag'[39m)[0m
+[0m [90m 22 |[39m [36mvar[39m fresh [33m=[39m require([32m'fresh'[39m)[0m
+[0m[31m[1m>[22m[39m[90m 23 |[39m [36mvar[39m fs [33m=[39m require([32m'fs'[39m)[0m
+[0m [90m    |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 24 |[39m [36mvar[39m mime [33m=[39m require([32m'mime'[39m)[0m
+[0m [90m 25 |[39m [36mvar[39m ms [33m=[39m require([32m'ms'[39m)[0m
+[0m [90m 26 |[39m [36mvar[39m onFinished [33m=[39m require([32m'on-finished'[39m)[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@genkit-ai/core/lib/reflection.js:36:31
+Module not found: Can't resolve 'fs/promises'
+[0m [90m 34 |[39m module[33m.[39mexports [33m=[39m __toCommonJS(reflection_exports)[33m;[39m[0m
+[0m [90m 35 |[39m [36mvar[39m import_express [33m=[39m __toESM(require([32m"express"[39m))[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 36 |[39m [36mvar[39m import_promises [33m=[39m __toESM(require([32m"fs/promises"[39m))[33m;[39m[0m
+[0m [90m    |[39m                               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 37 |[39m [36mvar[39m import_get_port [33m=[39m __toESM(require([32m"get-port"[39m))[33m;[39m[0m
+[0m [90m 38 |[39m [36mvar[39m import_path [33m=[39m __toESM(require([32m"path"[39m))[33m;[39m[0m
+[0m [90m 39 |[39m [36mvar[39m z [33m=[39m __toESM(require([32m"zod"[39m))[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/grpc-js/build/src/load-balancing-call.js:28:15
+Module not found: Can't resolve 'http2'
+[0m [90m 26 |[39m [36mconst[39m logging [33m=[39m require([32m"./logging"[39m)[33m;[39m[0m
+[0m [90m 27 |[39m [36mconst[39m control_plane_status_1 [33m=[39m require([32m"./control-plane-status"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 28 |[39m [36mconst[39m http2 [33m=[39m require([32m"http2"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 29 |[39m [36mconst[39m [33mTRACER_NAME[39m [33m=[39m [32m'load_balancing_call'[39m[33m;[39m[0m
+[0m [90m 30 |[39m [36mclass[39m [33mLoadBalancingCall[39m {[0m
+[0m [90m 31 |[39m     constructor(channel[33m,[39m callConfig[33m,[39m methodName[33m,[39m host[33m,[39m credentials[33m,[39m deadline[33m,[39m callNumber) {[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/grpc-js/build/src/server-interceptors.js:24:15
+Module not found: Can't resolve 'http2'
+[0m [90m 22 |[39m [36mconst[39m metadata_1 [33m=[39m require([32m"./metadata"[39m)[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 24 |[39m [36mconst[39m http2 [33m=[39m require([32m"http2"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 25 |[39m [36mconst[39m error_1 [33m=[39m require([32m"./error"[39m)[33m;[39m[0m
+[0m [90m 26 |[39m [36mconst[39m zlib [33m=[39m require([32m"zlib"[39m)[33m;[39m[0m
+[0m [90m 27 |[39m [36mconst[39m stream_decoder_1 [33m=[39m require([32m"./stream-decoder"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/grpc-js/build/src/server.js:54:15
+Module not found: Can't resolve 'http2'
+[0m [90m 52 |[39m [33mObject[39m[33m.[39mdefineProperty(exports[33m,[39m [32m"__esModule"[39m[33m,[39m { value[33m:[39m [36mtrue[39m })[33m;[39m[0m
+[0m [90m 53 |[39m exports[33m.[39m[33mServer[39m [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 54 |[39m [36mconst[39m http2 [33m=[39m require([32m"http2"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 55 |[39m [36mconst[39m util [33m=[39m require([32m"util"[39m)[33m;[39m[0m
+[0m [90m 56 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m [90m 57 |[39m [36mconst[39m server_call_1 [33m=[39m require([32m"./server-call"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/grpc-js/build/src/subchannel-call.js:20:15
+Module not found: Can't resolve 'http2'
+[0m [90m 18 |[39m [33mObject[39m[33m.[39mdefineProperty(exports[33m,[39m [32m"__esModule"[39m[33m,[39m { value[33m:[39m [36mtrue[39m })[33m;[39m[0m
+[0m [90m 19 |[39m exports[33m.[39m[33mHttp2SubchannelCall[39m [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 20 |[39m [36mconst[39m http2 [33m=[39m require([32m"http2"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 21 |[39m [36mconst[39m os [33m=[39m require([32m"os"[39m)[33m;[39m[0m
+[0m [90m 22 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m metadata_1 [33m=[39m require([32m"./metadata"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/grpc-js/build/src/transport.js:20:15
+Module not found: Can't resolve 'http2'
+[0m [90m 18 |[39m [33mObject[39m[33m.[39mdefineProperty(exports[33m,[39m [32m"__esModule"[39m[33m,[39m { value[33m:[39m [36mtrue[39m })[33m;[39m[0m
+[0m [90m 19 |[39m exports[33m.[39m[33mHttp2SubchannelConnector[39m [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 20 |[39m [36mconst[39m http2 [33m=[39m require([32m"http2"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 21 |[39m [36mconst[39m channelz_1 [33m=[39m require([32m"./channelz"[39m)[33m;[39m[0m
+[0m [90m 22 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m http_proxy_1 [33m=[39m require([32m"./http_proxy"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/grpc-js/build/src/channelz.js:24:15
+Module not found: Can't resolve 'net'
+[0m [90m 22 |[39m exports[33m.[39mgetChannelzServiceDefinition [33m=[39m getChannelzServiceDefinition[33m;[39m[0m
+[0m [90m 23 |[39m exports[33m.[39msetup [33m=[39m setup[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 24 |[39m [36mconst[39m net_1 [33m=[39m require([32m"net"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 25 |[39m [36mconst[39m ordered_map_1 [33m=[39m require([32m"@js-sdsl/ordered-map"[39m)[33m;[39m[0m
+[0m [90m 26 |[39m [36mconst[39m connectivity_state_1 [33m=[39m require([32m"./connectivity-state"[39m)[33m;[39m[0m
+[0m [90m 27 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/grpc-js/build/src/http_proxy.js:24:15
+Module not found: Can't resolve 'net'
+[0m [90m 22 |[39m [36mconst[39m logging_1 [33m=[39m require([32m"./logging"[39m)[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 24 |[39m [36mconst[39m net_1 [33m=[39m require([32m"net"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 25 |[39m [36mconst[39m http [33m=[39m require([32m"http"[39m)[33m;[39m[0m
+[0m [90m 26 |[39m [36mconst[39m logging [33m=[39m require([32m"./logging"[39m)[33m;[39m[0m
+[0m [90m 27 |[39m [36mconst[39m subchannel_address_1 [33m=[39m require([32m"./subchannel-address"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/grpc-js/build/src/load-balancer-pick-first.js:29:15
+Module not found: Can't resolve 'net'
+[0m [90m 27 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m [90m 28 |[39m [36mconst[39m subchannel_address_2 [33m=[39m require([32m"./subchannel-address"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 29 |[39m [36mconst[39m net_1 [33m=[39m require([32m"net"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 30 |[39m [36mconst[39m [33mTRACER_NAME[39m [33m=[39m [32m'pick_first'[39m[33m;[39m[0m
+[0m [90m 31 |[39m [36mfunction[39m trace(text) {[0m
+[0m [90m 32 |[39m     logging[33m.[39mtrace(constants_1[33m.[39m[33mLogVerbosity[39m[33m.[39m[33mDEBUG[39m[33m,[39m [33mTRACER_NAME[39m[33m,[39m text)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/grpc-js/build/src/resolver-dns.js:28:15
+Module not found: Can't resolve 'net'
+[0m [90m 26 |[39m [36mconst[39m constants_2 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m [90m 27 |[39m [36mconst[39m uri_parser_1 [33m=[39m require([32m"./uri-parser"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 28 |[39m [36mconst[39m net_1 [33m=[39m require([32m"net"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 29 |[39m [36mconst[39m backoff_timeout_1 [33m=[39m require([32m"./backoff-timeout"[39m)[33m;[39m[0m
+[0m [90m 30 |[39m [36mconst[39m environment_1 [33m=[39m require([32m"./environment"[39m)[33m;[39m[0m
+[0m [90m 31 |[39m [36mconst[39m [33mTRACER_NAME[39m [33m=[39m [32m'dns_resolver'[39m[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/grpc-js/build/src/resolver-ip.js:19:15
+Module not found: Can't resolve 'net'
+[0m [90m 17 |[39m [33mObject[39m[33m.[39mdefineProperty(exports[33m,[39m [32m"__esModule"[39m[33m,[39m { value[33m:[39m [36mtrue[39m })[33m;[39m[0m
+[0m [90m 18 |[39m exports[33m.[39msetup [33m=[39m setup[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 19 |[39m [36mconst[39m net_1 [33m=[39m require([32m"net"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 20 |[39m [36mconst[39m constants_1 [33m=[39m require([32m"./constants"[39m)[33m;[39m[0m
+[0m [90m 21 |[39m [36mconst[39m metadata_1 [33m=[39m require([32m"./metadata"[39m)[33m;[39m[0m
+[0m [90m 22 |[39m [36mconst[39m resolver_1 [33m=[39m require([32m"./resolver"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/grpc-js/build/src/subchannel-address.js:27:15
+Module not found: Can't resolve 'net'
+[0m [90m 25 |[39m exports[33m.[39mendpointToString [33m=[39m endpointToString[33m;[39m[0m
+[0m [90m 26 |[39m exports[33m.[39mendpointHasAddress [33m=[39m endpointHasAddress[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 27 |[39m [36mconst[39m net_1 [33m=[39m require([32m"net"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 28 |[39m [36mfunction[39m isTcpSubchannelAddress(address) {[0m
+[0m [90m 29 |[39m     [36mreturn[39m [32m'port'[39m [36min[39m address[33m;[39m[0m
+[0m [90m 30 |[39m }[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/grpc-js/build/src/transport.js:28:13
+Module not found: Can't resolve 'net'
+[0m [90m 26 |[39m [36mconst[39m subchannel_address_1 [33m=[39m require([32m"./subchannel-address"[39m)[33m;[39m[0m
+[0m [90m 27 |[39m [36mconst[39m uri_parser_1 [33m=[39m require([32m"./uri-parser"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 28 |[39m [36mconst[39m net [33m=[39m require([32m"net"[39m)[33m;[39m[0m
+[0m [90m    |[39m             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 29 |[39m [36mconst[39m subchannel_call_1 [33m=[39m require([32m"./subchannel-call"[39m)[33m;[39m[0m
+[0m [90m 30 |[39m [36mconst[39m call_number_1 [33m=[39m require([32m"./call-number"[39m)[33m;[39m[0m
+[0m [90m 31 |[39m [36mconst[39m [33mTRACER_NAME[39m [33m=[39m [32m'transport'[39m[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/express/lib/request.js:18:12
+Module not found: Can't resolve 'net'
+[0m [90m 16 |[39m [36mvar[39m accepts [33m=[39m require([32m'accepts'[39m)[33m;[39m[0m
+[0m [90m 17 |[39m [36mvar[39m deprecate [33m=[39m require([32m'depd'[39m)([32m'express'[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 18 |[39m [36mvar[39m isIP [33m=[39m require([32m'net'[39m)[33m.[39misIP[33m;[39m[0m
+[0m [90m    |[39m            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 19 |[39m [36mvar[39m typeis [33m=[39m require([32m'type-is'[39m)[33m;[39m[0m
+[0m [90m 20 |[39m [36mvar[39m http [33m=[39m require([32m'http'[39m)[33m;[39m[0m
+[0m [90m 21 |[39m [36mvar[39m fresh [33m=[39m require([32m'fresh'[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/get-port/index.js:2:13
+Module not found: Can't resolve 'net'
+[0m [90m 1 |[39m [32m'use strict'[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 2 |[39m [36mconst[39m net [33m=[39m require([32m'net'[39m)[33m;[39m[0m
+[0m [90m   |[39m             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 3 |[39m[0m
+[0m [90m 4 |[39m [36mclass[39m [33mLocked[39m [36mextends[39m [33mError[39m {[0m
+[0m [90m 5 |[39m 	constructor(port) {[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/@grpc/grpc-js/build/src/channel-credentials.js:21:15
+Module not found: Can't resolve 'tls'
+[0m [90m 19 |[39m exports[33m.[39m[33mChannelCredentials[39m [33m=[39m [36mvoid[39m [35m0[39m[33m;[39m[0m
+[0m [90m 20 |[39m exports[33m.[39mcreateCertificateProviderChannelCredentials [33m=[39m createCertificateProviderChannelCredentials[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 21 |[39m [36mconst[39m tls_1 [33m=[39m require([32m"tls"[39m)[33m;[39m[0m
+[0m [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 22 |[39m [36mconst[39m call_credentials_1 [33m=[39m require([32m"./call-credentials"[39m)[33m;[39m[0m
+[0m [90m 23 |[39m [36mconst[39m tls_helpers_1 [33m=[39m require([32m"./tls-helpers"[39m)[33m;[39m[0m
+[0m [90m 24 |[39m [36mconst[39m uri_parser_1 [33m=[39m require([32m"./uri-parser"[39m)[33m;[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./node_modules/express/lib/view.js:81:14
+Module not found: Can't resolve <dynamic>
+[0m [90m 79 |[39m[0m
+[0m [90m 80 |[39m     [90m// default engine export[39m[0m
+[0m[31m[1m>[22m[39m[90m 81 |[39m     [36mvar[39m fn [33m=[39m require(mod)[33m.[39m__express[0m
+[0m [90m    |[39m              [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 82 |[39m[0m
+[0m [90m 83 |[39m     [36mif[39m ([36mtypeof[39m fn [33m!==[39m [32m'function'[39m) {[0m
+[0m [90m 84 |[39m       [36mthrow[39m [36mnew[39m [33mError[39m([32m'Module "'[39m [33m+[39m mod [33m+[39m [32m'" does not provide a view engine.'[39m)[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+./src/app/page.tsx:10:1
+Export extractPromptsFromText doesn't exist in target module
+[0m [90m  8 |[39m [36mimport[39m { generateImageFromPrompt } [36mfrom[39m [32m'@/ai/flows/generate-image-from-prompt'[39m[33m;[39m[0m
+[0m [90m  9 |[39m [36mimport[39m { refineImage } [36mfrom[39m [32m'@/ai/flows/refine-image-flow'[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 10 |[39m [36mimport[39m { extractPromptsFromText } [36mfrom[39m [32m'@/ai/flows/extract-prompts-from-text-flow'[39m[33m;[39m[0m
+[0m [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 11 |[39m [36mimport[39m { aiProviderService } [36mfrom[39m [32m'@/ai/ai-provider-service'[39m[33m;[39m[0m
+[0m [90m 12 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/button'[39m[33m;[39m[0m
+[0m [90m 13 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/textarea'[39m[33m;[39m[0m
+
+The export extractPromptsFromText was not found in module [project]/src/ai/flows/extract-prompts-from-text-flow.ts [app-client] (ecmascript).
+The module has no exports at all.
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+
+
+./src/app/page.tsx:10:1
+Export extractPromptsFromText doesn't exist in target module
+[0m [90m  8 |[39m [36mimport[39m { generateImageFromPrompt } [36mfrom[39m [32m'@/ai/flows/generate-image-from-prompt'[39m[33m;[39m[0m
+[0m [90m  9 |[39m [36mimport[39m { refineImage } [36mfrom[39m [32m'@/ai/flows/refine-image-flow'[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 10 |[39m [36mimport[39m { extractPromptsFromText } [36mfrom[39m [32m'@/ai/flows/extract-prompts-from-text-flow'[39m[33m;[39m[0m
+[0m [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 11 |[39m [36mimport[39m { aiProviderService } [36mfrom[39m [32m'@/ai/ai-provider-service'[39m[33m;[39m[0m
+[0m [90m 12 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/button'[39m[33m;[39m[0m
+[0m [90m 13 |[39m [36mimport[39m { [33mTextarea[39m } [36mfrom[39m [32m'@/components/ui/textarea'[39m[33m;[39m[0m
+
+The export extractPromptsFromText was not found in module [project]/src/ai/flows/extract-prompts-from-text-flow.ts [app-ssr] (ecmascript).
+The module has no exports at all.
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+
+
+./node_modules/@genkit-ai/ai/lib/model.mjs
+Code generation for chunk item errored
+An error occurred while generating the chunk item [project]/node_modules/@genkit-ai/ai/lib/model.mjs [app-client] (ecmascript) <locals>
+
+Caused by:
+- the chunking context (unknown) does not support external modules (request: node:perf_hooks)
+
+Debug info:
+- An error occurred while generating the chunk item [project]/node_modules/@genkit-ai/ai/lib/model.mjs [app-client] (ecmascript) <locals>
+- Execution of <EcmascriptModuleLocalsChunkItem as EcmascriptChunkItem>::content_with_async_module_info failed
+- Execution of EcmascriptModuleContent::new failed
+- the chunking context (unknown) does not support external modules (request: node:perf_hooks)
+
+
+
+./node_modules/@genkit-ai/ai/lib/model.mjs
+Code generation for chunk item errored
+An error occurred while generating the chunk item [project]/node_modules/@genkit-ai/ai/lib/model.mjs [app-client] (ecmascript) <module evaluation>
+
+Caused by:
+- the chunking context (unknown) does not support external modules (request: node:perf_hooks)
+
+Debug info:
+- An error occurred while generating the chunk item [project]/node_modules/@genkit-ai/ai/lib/model.mjs [app-client] (ecmascript) <module evaluation>
+- Execution of <EcmascriptModuleFacadeChunkItem as EcmascriptChunkItem>::content_with_async_module_info failed
+- the chunking context (unknown) does not support external modules (request: node:perf_hooks)
+
+
+
+./node_modules/fetch-blob/from.js
+Code generation for chunk item errored
+An error occurred while generating the chunk item [project]/node_modules/fetch-blob/from.js [app-client] (ecmascript) <locals>
+
+Caused by:
+- the chunking context (unknown) does not support external modules (request: node:fs)
+
+Debug info:
+- An error occurred while generating the chunk item [project]/node_modules/fetch-blob/from.js [app-client] (ecmascript) <locals>
+- Execution of <EcmascriptModuleLocalsChunkItem as EcmascriptChunkItem>::content_with_async_module_info failed
+- Execution of EcmascriptModuleContent::new failed
+- the chunking context (unknown) does not support external modules (request: node:fs)
+
+
+
+./node_modules/fetch-blob/from.js
+Code generation for chunk item errored
+An error occurred while generating the chunk item [project]/node_modules/fetch-blob/from.js [app-client] (ecmascript) <module evaluation>
+
+Caused by:
+- the chunking context (unknown) does not support external modules (request: node:fs)
+
+Debug info:
+- An error occurred while generating the chunk item [project]/node_modules/fetch-blob/from.js [app-client] (ecmascript) <module evaluation>
+- Execution of <EcmascriptModuleFacadeChunkItem as EcmascriptChunkItem>::content_with_async_module_info failed
+- the chunking context (unknown) does not support external modules (request: node:fs)
+
+
+
+./node_modules/node-fetch/src/utils/referrer.js
+Code generation for chunk item errored
+An error occurred while generating the chunk item [project]/node_modules/node-fetch/src/utils/referrer.js [app-client] (ecmascript)
+
+Caused by:
+- the chunking context (unknown) does not support external modules (request: node:net)
+
+Debug info:
+- An error occurred while generating the chunk item [project]/node_modules/node-fetch/src/utils/referrer.js [app-client] (ecmascript)
+- Execution of <ModuleChunkItem as EcmascriptChunkItem>::content_with_async_module_info failed
+- Execution of EcmascriptModuleContent::new failed
+- the chunking context (unknown) does not support external modules (request: node:net)
+
+
+ HEAD / 500 in 9765ms
+ ✓ Compiled in 1087ms
