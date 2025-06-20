@@ -73,13 +73,13 @@ check_prerequisites() {
     fi
     
     # Verificar que PM2 está instalado
-    if ! command -v pm2 &> /dev/null; then
+    if ! command pm2 -v &> /dev/null; then
         log_error "PM2 no está instalado"
         exit 1
     fi
     
     # Verificar que Node.js está instalado
-    if ! command -v node &> /dev/null; then
+    if ! command node -v &> /dev/null; then
         log_error "Node.js no está instalado"
         exit 1
     fi
