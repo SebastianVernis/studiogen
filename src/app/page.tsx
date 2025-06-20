@@ -182,13 +182,7 @@ const ImageGeneratorApp = () => {
     .every(config => !config.isEnabledGlobal);
 
 
-  // Initialize AI Provider Service
-  useEffect(() => {
-    aiProviderService.setConfiguration({
-      provider: selectedAIProvider,
-      model: selectedAIModel
-    });
-  }, [selectedAIProvider, selectedAIModel]);
+
 
   const dataURIToBlob = (dataURI: string): Blob => {
     const byteString = atob(dataURI.split(',')[1]);

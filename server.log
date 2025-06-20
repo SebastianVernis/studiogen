@@ -1136,3 +1136,10 @@ Debug info:
 
  HEAD / 500 in 9765ms
  ✓ Compiled in 1087ms
+ ✓ Compiled / in 102ms
+ HEAD / 200 in 641ms
+ GET / 200 in 109ms
+ ⚠ Cross origin request detected from ee3dac6c8bb3fdf0d0.blackbx.ai to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ HEAD / 200 in 552ms
+ GET / 200 in 103ms
