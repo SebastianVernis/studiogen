@@ -36,24 +36,41 @@ fi
 print_status "Updating system packages..."
 yum update -y
 
-# Install Node.js 18.x (LTS)
-print_status "Installing Node.js 18.x..."
-curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
-yum install -y nodejs
+# Check for Node.js installation (must be pre-installed)
+print_status "Checking for Node.js installation..."
+if ! command -v node &> /dev/null; then
+    print_error "Node.js is not installed. Please install Node.js 18.x or higher before running this script."
+    print_error "Installation guide: https://nodejs.org/en/download/package-manager/"
+    exit 1
+fi
 
-# Verify Node.js installation
-print_status "Verifying Node.js installation..."
+if ! command -v npm &> /dev/null; then
+    print_error "npm is not installed. Please install npm before running this script."
+    exit 1
+fi
+
+# Verify Node.js version
 node_version=$(node -v)
 npm_version=$(npm -v)
 print_status "Node.js version: $node_version"
 print_status "npm version: $npm_version"
 
-# Install PM2 globally
-print_status "Installing PM2 process manager..."
-npm install -g pm2
+# Check Node.js version compatibility (minimum v16)
+node_major_version=$(node -v | cut -d'.' -f1 | sed 's/v//')
+if [ "$node_major_version" -lt 16 ]; then
+    print_error "Node.js version $node_version is not supported. Please install Node.js 16.x or higher."
+    exit 1
+fi
+
+# Check for PM2 installation (must be pre-installed)
+print_status "Checking for PM2 installation..."
+if ! command -v pm2 &> /dev/null; then
+    print_error "PM2 is not installed. Please install PM2 globally before running this script."
+    print_error "Install with: npm install -g pm2"
+    exit 1
+fi
 
 # Verify PM2 installation
-print_status "Verifying PM2 installation..."
 pm2_version=$(pm2 -V)
 print_status "PM2 version: $pm2_version"
 
@@ -80,7 +97,18 @@ fi
 
 # Install dependencies
 print_status "Installing application dependencies..."
-npm install
+if [ -f "node_modules.tar.gz" ]; then
+    print_status "Found pre-bundled dependencies, extracting..."
+    tar -xzf node_modules.tar.gz
+    print_status "Dependencies extracted from cache"
+elif [ -d "offline_cache" ]; then
+    print_status "Installing from offline cache..."
+    npm install --cache ./offline_cache --prefer-offline
+else
+    print_warning "No offline cache found, installing from registry..."
+    print_warning "This requires internet connection and may download packages from npm registry"
+    npm install
+fi
 
 # Create .env file if it doesn't exist
 if [ ! -f ".env" ]; then
